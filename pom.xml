@@ -24,7 +24,10 @@
                 <!--                    <port>80</port>-->
                 <!--                    <path>/</path>-->
                 <!--                </configuration>-->
-            </plugin></plugins>
+            </plugin>
+
+
+        </plugins>
     </build>
 
     <dependencies>
@@ -34,7 +37,6 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-
 
         <!--        数据库连接驱动-->
         <dependency>

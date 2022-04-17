@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+
+    <style>
+        .center {
+            width: 500px;
+            height: 350px;
+            background-color:gainsboro;
+            border-radius: 5px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div  id="login">
+    <el-container class="center">
+        <el-main>
+            <el-form :model="user" :rules="rules" ref="user" label-width="100px" class="demo-ruleForm" id="loginDiv">
+                <el-form-item >
+                    <el-header >欢迎登录</el-header>
+                </el-form-item>
+
+                <el-form-item label="用户名:" prop="username">
+                    <el-input v-model="user.username" style="width: 300px;" @blur.native.capture="myOnblur"
+                              :plain="true"></el-input>
+                </el-form-item>
+
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model="user.password" autocomplete="off"
+                              style="width: 300px;"></el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <template>
+                        <el-button type="primary" @click="submitForm('user')" :plain="true">登录</el-button>
+
+                        <el-button @click="resetForm('user')">重置</el-button>
+                        <div>
+                            没有账号?
+                            <el-link type="primary"
+                                     >
+                                注册
+                            </el-link>
+                        </div>
+                    </template>
+                </el-form-item>
+            </el-form>
+        </el-main>
+    </el-container>
+</div>
+
+<!--导入依赖-->
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+
+<script>
+    //创建vue对象
+    new Vue({
+        el: "#loginDiv",
+        data() {
+            return {
+                //登录表单
+                user: {
+                    username: '',
+                    password: '',
+                },
+                //表单校验
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'onblur'},
+                        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'onblur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'onblur'},
+                        {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'onblur'}
+                    ],
+                }
+
+            }
+        },
+
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const _this = this;
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/user/login",
+                            data: _this.user,
+                        }).then(function (resp) {
+
+                            console.log(resp.data);
+                            console.log(resp.data.code);
+
+                            if (resp.data.code === 200) {
+                                _this.$message({
+                                    message: '登录成功~',
+                                    type: 'success'
+                                });
+                                //通过用户的职位进行页面的跳转
+                                location.href = "http://localhost:63342/qg-engineering-management-system/src/main/webapp/mainMenu.html";
+                            } else if (resp.data.code === 500200) {
+                                _this.$message.error(resp.data.msg);
+                            } else {
+                                _this.$message.error('未知错误,请联系管理员');
+                            }
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            register(formName) {
+                location.href = "http://localhost:63342/qg-baseservlet-demo/src/main/webapp/register.html";
+                _this.$message.error('师兄,注册还没开始做,验证码一直有bug');
+            },
+            //用户名输入失焦,去看看数据库是否有没有对应的名字
+            myOnblur() {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp)  {
+                    if (resp.data.code === 500220) {
+                        _this.$message.error(resp.data.msg);
+                    }
+                })
+            }
+        },
+    });
+
+
+</script>
+
+
+</body>
+</html>
