@@ -14,7 +14,7 @@ public class LoginFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest request = (HttpServletRequest) req;
-
+        resp.setContentType("text/json;charset=utf-8");
 
         //不需要拦截的地址
         String[] urls = {"/login.html","user","/js/","/element-ui/","/register.html"};
@@ -30,8 +30,8 @@ public class LoginFilter implements Filter {
         }
 
         HttpSession session = request.getSession();
+        Object user = session.getAttribute("username");
 
-        Object user = session.getAttribute("user");
         System.out.println(user);
         if (user == null) {
             //没有就拦截,回退到登录页面
@@ -39,6 +39,7 @@ public class LoginFilter implements Filter {
             request.getRequestDispatcher("/login.html").forward(request,resp);
         }else {
             //登录过了,就放行
+            System.out.println(user+"您已登录");
             chain.doFilter(req, resp);
         }
     }

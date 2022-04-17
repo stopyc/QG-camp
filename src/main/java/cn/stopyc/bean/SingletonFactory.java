@@ -1,6 +1,9 @@
 package cn.stopyc.bean;
 
+import cn.stopyc.dao.TaskDao;
+import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.dao.impl.UserDaoImpl;
+import cn.stopyc.service.impl.TaskServiceImpl;
 import cn.stopyc.service.impl.UserServiceImpl;
 
 import java.lang.reflect.Constructor;
@@ -15,26 +18,19 @@ import java.lang.reflect.InvocationTargetException;
 public class SingletonFactory {
 
     private static UserServiceImpl userServiceSingleton;
+    private static TaskServiceImpl taskServiceSingleton;
+
     private static UserDaoImpl userDaoSingleton;
+    private static TaskDaoImpl taskDaoSingleton;
 
     static {
         try {
 
-//            Class<?> userCl = Class.forName(UserServiceImpl.class.getName());
-//            Class<?> userDaoCl = Class.forName(UserDaoImpl.class.getName());
-//
-//            Constructor<?> userDeclaredConstructor = userCl.getDeclaredConstructor();
-//            Constructor<?> userDaoDeclaredConstructor = userDaoCl.getDeclaredConstructor();
-//
-//            userDeclaredConstructor.setAccessible(true);
-//            userDaoDeclaredConstructor.setAccessible(true);
-//
-//            userServiceSingleton = (UserServiceImpl)userDeclaredConstructor.newInstance();
             userServiceSingleton = (UserServiceImpl)getSingleByName(UserServiceImpl.class.getName());
+            taskServiceSingleton = (TaskServiceImpl)getSingleByName(TaskServiceImpl.class.getName());
 
-            System.out.println(userServiceSingleton);
-//            userDaoSingleton = (UserDaoImpl)userDaoDeclaredConstructor.newInstance();
             userDaoSingleton = (UserDaoImpl)getSingleByName(UserDaoImpl.class.getName());
+            taskDaoSingleton = (TaskDaoImpl)getSingleByName(TaskDaoImpl.class.getName());
 
 
         } catch (Exception e) {
@@ -62,8 +58,16 @@ public class SingletonFactory {
     public static UserServiceImpl getUserServiceSingleton() {
         return userServiceSingleton;
     }
+    public static TaskServiceImpl getTaskServiceSingleton() {
+        return taskServiceSingleton;
+    }
+
+
     public static UserDaoImpl getUserDaoSingleton() {
         return userDaoSingleton;
+    }
+    public static TaskDaoImpl getTaskDaoSingleton() {
+        return taskDaoSingleton;
     }
 
 }

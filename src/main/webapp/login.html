@@ -71,7 +71,6 @@
     new Vue({
         el: "#loginDiv",
         data() {
-
             const validateUserName = (rule, value, callback) => {
                 const _this = this;
                 axios({
@@ -125,11 +124,12 @@
 
                             if (resp.data.code === 200) {
                                 _this.$message({
-                                    message: '登录成功~',
+                                    message: '登录成功~3秒后跳转',
                                     type: 'success'
                                 });
                                 //通过用户的职位进行页面的跳转
-                                location.href = "http://localhost:63342/qg-engineering-management-system/src/main/webapp/mainMenu.html";
+                                setTimeout(_this.changeMain,3000);
+
                             } else if (resp.data.code === 500200) {
                                 _this.$message.error(resp.data.msg);
                             } else {
@@ -163,6 +163,10 @@
                         _this.$message.error(resp.data.msg);
                     }
                 })
+            },
+
+            changeMain() {
+                location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
             }
         },
     });

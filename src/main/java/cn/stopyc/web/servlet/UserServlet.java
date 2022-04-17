@@ -4,7 +4,10 @@ import cn.stopyc.bean.SingletonFactory;
 
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
+import cn.stopyc.dao.TaskDao;
+import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
+import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
 import cn.stopyc.util.CheckCodeUtil;
 import cn.stopyc.util.JsonUtil;
@@ -20,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @program: qg-baseservlet-demo
@@ -43,9 +47,9 @@ public class UserServlet extends BaseServlet{
     */
     public void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        System.out.println("我是login");
+//        System.out.println("我是login");
 
-        resp.setContentType("text/json;charset=utf-8");
+//        resp.setContentType("text/json;charset=utf-8");
 
         //1.获取前端数据(post)请求体
         BufferedReader reader = req.getReader();
@@ -68,7 +72,9 @@ public class UserServlet extends BaseServlet{
         try {
 //            String contextPath = req.getContextPath();
 //            resp.sendRedirect(contextPath+"/user/*");
-            userResult.getData().setPassword("");
+//            userResult.getData().setPassword("");
+            HttpSession session = req.getSession();
+            session.setAttribute("username",user.getUserName());
             JsonUtil.toJson(userResult,resp);
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +84,7 @@ public class UserServlet extends BaseServlet{
 
 
     public void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
+//        req.setCharacterEncoding("UTF-8");
 //        //获取用户名,密码,验证码
 
         //1.获取前端数据(post)请求体
@@ -99,7 +105,7 @@ public class UserServlet extends BaseServlet{
 
     public void checkCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        response.setContentType("text/json;charset=utf-8");
+//        response.setContentType("text/json;charset=utf-8");
 
         //1.获取前端数据(post)请求体
         BufferedReader reader = request.getReader();
@@ -135,7 +141,7 @@ public class UserServlet extends BaseServlet{
     * @Date: 2022/4/16
     */
     public void select(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/json;charset=utf-8");
+//        resp.setContentType("text/json;charset=utf-8");
         //1.获取前端数据(post)
         BufferedReader reader = req.getReader();
         String userStr = reader.readLine();
@@ -151,6 +157,39 @@ public class UserServlet extends BaseServlet{
         System.out.println("code  "+userResult.getCode());
         try {
             JsonUtil.toJson(userResult,resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+    * @Description: 获取当前用户的任务
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/17
+    */
+    public void selectMyTask(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession session = req.getSession();
+        String  username = (String) session.getAttribute("username");
+
+        //2.获取userService对象
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+
+        //3.获取当前用户的id
+        Integer idByName = userService.getIdByName(username);
+
+        //5.获取taskService对象
+        TaskService taskService = SingletonFactory.getTaskServiceSingleton();
+
+        //6.获取用户下的任务,并封装成对象返回来
+        Result<List<Task>> taskResult = taskService.getTaskByUserId(idByName);
+
+        System.out.println(taskResult.getData().get(0));
+        //7.返回结果集
+        try {
+            JsonUtil.toJson(taskResult,resp);
         } catch (Exception e) {
             e.printStackTrace();
         }

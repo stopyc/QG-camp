@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目总负责人</title>
+
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+
+<el-container style="height: 800px; border: 1px solid #eee" id="chiefPeople">
+    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <el-menu :default-openeds="['1', '3']">
+<!--            <el-submenu index="1">-->
+<!--                <template slot="title"><i class="el-icon-message"></i>导航一</template>-->
+                <el-menu-item index="1">管理团队</el-menu-item>
+<!--                <el-menu-item-group>-->
+<!--                    <template slot="title">分组一</template>-->
+<!--                    <el-menu-item index="1-1">选项1</el-menu-item>-->
+<!--                    <el-menu-item index="1-2">选项2</el-menu-item>-->
+<!--                </el-menu-item-group>-->
+<!--                <el-menu-item-group title="分组2">-->
+<!--                    <el-menu-item index="1-3">选项3</el-menu-item>-->
+<!--                </el-menu-item-group>-->
+<!--                <el-submenu index="1-4">-->
+<!--                    <template slot="title">选项4</template>-->
+<!--                    <el-menu-item index="1-4-1">选项4-1</el-menu-item>-->
+<!--                </el-submenu>-->
+<!--            </el-submenu>-->
+            <el-menu-item index="2">个人信息</el-menu-item>
+<!--            <el-submenu index="2">-->
+<!--                <template slot="title"><i class="el-icon-menu"></i>导航二</template>-->
+<!--                <el-menu-item-group>-->
+<!--                    <template slot="title">分组一</template>-->
+<!--                    <el-menu-item index="2-1">选项1</el-menu-item>-->
+<!--                    <el-menu-item index="2-2">选项2</el-menu-item>-->
+<!--                </el-menu-item-group>-->
+<!--                <el-menu-item-group title="分组2">-->
+<!--                    <el-menu-item index="2-3">选项3</el-menu-item>-->
+<!--                </el-menu-item-group>-->
+<!--                <el-submenu index="2-4">-->
+<!--                    <template slot="title">选项4</template>-->
+<!--                    <el-menu-item index="2-4-1">选项4-1</el-menu-item>-->
+<!--                </el-submenu>-->
+<!--            </el-submenu>-->
+            <el-menu-item index="3">消息通知</el-menu-item>
+<!--            <el-submenu index="3">-->
+<!--                <template slot="title"><i class="el-icon-setting"></i>导航三</template>-->
+<!--                <el-menu-item-group>-->
+<!--                    <template slot="title">分组一</template>-->
+<!--                    <el-menu-item index="3-1">选项1</el-menu-item>-->
+<!--                    <el-menu-item index="3-2">选项2</el-menu-item>-->
+<!--                </el-menu-item-group>-->
+<!--                <el-menu-item-group title="分组2">-->
+<!--                    <el-menu-item index="3-3">选项3</el-menu-item>-->
+<!--                </el-menu-item-group>-->
+<!--                <el-submenu index="3-4">-->
+<!--                    <template slot="title">选项4</template>-->
+<!--                    <el-menu-item index="3-4-1">选项4-1</el-menu-item>-->
+<!--                </el-submenu>-->
+<!--            </el-submenu>-->
+        </el-menu>
+    </el-aside>
+
+
+    <el-container>
+        <el-header style="text-align: right; font-size: 12px">
+            <el-dropdown>
+                <i class="el-icon-setting" style="margin-right: 15px"></i>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>查看</el-dropdown-item>
+                    <el-dropdown-item>新增</el-dropdown-item>
+                    <el-dropdown-item>删除</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+            <span>王小虎</span>
+        </el-header>
+
+        <!--        任务列表-->
+        <el-form :inline="true" :model="myTaskTableData" class="myTaskTableData">
+            <template>
+
+                <el-table
+                        :data="myTaskTableData"
+                        style="width: 100%"
+                        :row-class-name="tableRowClassName"
+                        @selection-change="handleSelectionChange"
+                >
+
+                    <el-table-column
+                            type="index"
+                            width="50">
+                    </el-table-column>
+
+                    <el-table-column
+                            prop="taskName"
+                            label="任务名称"
+                            align="center"
+                    >
+                    </el-table-column>
+
+                    <el-table-column
+                            prop="level"
+                            label="难度"
+                            align="center"
+                    >
+                    </el-table-column>
+
+                    <el-table-column
+                            prop="deadline"
+                            align="center"
+                            label="截止日期"
+                    >
+                    </el-table-column>
+
+                    <el-table-column
+                            prop="status"
+                            align="center"
+                            label="子任务数"
+                    >
+                    </el-table-column>
+
+                    <el-table-column
+                            prop="status"
+                            align="center"
+                            label="当前状态"
+                    >
+                    </el-table-column>
+
+                    <el-table-column
+                            align="center"
+                            label="操作">
+                        <el-row>
+                            <el-button type="primary">完成</el-button>
+                            <el-button type="success">添加项目</el-button>
+                        </el-row>
+
+                    </el-table-column>
+
+                </el-table>
+            </template>
+        </el-form>
+
+<!--        &lt;!&ndash;        我的队伍-表头&ndash;&gt;-->
+<!--        <el-form :inline="true" :model="team" class="demo-form-inline">-->
+
+<!--            &lt;!&ndash;        我的队伍-内容&ndash;&gt;-->
+<!--            <template>-->
+<!--                <el-table-->
+<!--                        :data="teamTableData"-->
+<!--                        style="width: 100%"-->
+<!--                        :row-class-name="tableRowClassName"-->
+<!--                        @selection-change="handleSelectionChange"-->
+<!--                >-->
+<!--                    <el-table-column-->
+<!--                            type="selection"-->
+<!--                            width="55">-->
+<!--                    </el-table-column>-->
+<!--                    <el-table-column-->
+<!--                            type="index"-->
+<!--                            width="50">-->
+<!--                    </el-table-column>-->
+
+<!--                    <el-table-column-->
+<!--                            prop="teamMemberName"-->
+<!--                            label="人员"-->
+<!--                            align="center"-->
+<!--                            width=60"-->
+<!--                    >-->
+<!--                    </el-table-column>-->
+
+<!--                    <el-table-column-->
+<!--                            prop="taskName"-->
+<!--                            label="任务"-->
+<!--                            align="center"-->
+<!--                    >-->
+<!--                    </el-table-column>-->
+
+<!--                    <el-table-column-->
+<!--                            prop="level"-->
+<!--                            label="难度"-->
+<!--                            align="center"-->
+<!--                            width="50"-->
+<!--                    >-->
+<!--                    </el-table-column>-->
+
+<!--                    <el-table-column-->
+<!--                            prop="deadline"-->
+<!--                            label="截止日期"-->
+<!--                            align="center"-->
+<!--                    >-->
+<!--                    </el-table-column>-->
+
+<!--                    <el-table-column-->
+<!--                            prop="status"-->
+<!--                            label="当前状态"-->
+<!--                            align="center"-->
+<!--                            width="60"-->
+<!--                    >-->
+<!--                    </el-table-column>-->
+
+<!--                    <el-table-column-->
+<!--                            align="center"-->
+<!--                            label="操作">-->
+
+<!--                        <el-row>-->
+<!--                            <el-button type="primary">添加任务</el-button>-->
+<!--                            <el-button type="success">查看</el-button>-->
+<!--                            <el-button type="danger">删除</el-button>-->
+<!--                        </el-row>-->
+
+<!--                    </el-table-column>-->
+
+<!--                </el-table>-->
+<!--            </template>-->
+
+<!--        </el-form>-->
+
+<!--        &lt;!&ndash;查询列表-表头&ndash;&gt;-->
+<!--        <el-form :inline="true" :model="team" class="demo-form-inline">-->
+
+<!--            <el-form-item label="当前状态">-->
+<!--                <el-select v-model="team.status" placeholder="当前状态">-->
+<!--                    <el-option label="启用" value="1"></el-option>-->
+<!--                    <el-option label="禁用" value="0"></el-option>-->
+<!--                </el-select>-->
+<!--            </el-form-item>-->
+
+<!--            <el-form-item label="企业名称">-->
+<!--                <el-input v-model="team.taskName" placeholder="企业名称"></el-input>-->
+<!--            </el-form-item>-->
+
+<!--            <el-form-item label="品牌名称">-->
+<!--                <el-input v-model="team.taskName" placeholder="品牌名称"></el-input>-->
+<!--            </el-form-item>-->
+
+<!--            <el-form-item>-->
+<!--                <el-button type="primary" @click="submitForm(team)">查询</el-button>-->
+<!--            </el-form-item>-->
+<!--        </el-form>-->
+        <!--查询列表-内容-->
+<!--        <template>-->
+<!--            <el-table-->
+<!--                    :data="tableData"-->
+<!--                    style="width: 100%"-->
+<!--                    :row-class-name="tableRowClassName"-->
+<!--                    @selection-change="handleSelectionChange"-->
+<!--            >-->
+<!--                <el-table-column-->
+<!--                        type="selection"-->
+<!--                        width="55">-->
+<!--                </el-table-column>-->
+<!--                <el-table-column-->
+<!--                        type="index"-->
+<!--                        width="50">-->
+<!--                </el-table-column>-->
+
+<!--                <el-table-column-->
+<!--                        prop="brandName"-->
+<!--                        label="品牌名称"-->
+<!--                        align="center"-->
+<!--                >-->
+<!--                </el-table-column>-->
+<!--                <el-table-column-->
+<!--                        prop="companyName"-->
+<!--                        label="企业名称"-->
+<!--                        align="center"-->
+<!--                >-->
+<!--                </el-table-column>-->
+<!--                <el-table-column-->
+<!--                        prop="ordered"-->
+<!--                        align="center"-->
+<!--                        label="排序">-->
+<!--                </el-table-column>-->
+<!--                <el-table-column-->
+<!--                        prop="status"-->
+<!--                        align="center"-->
+<!--                        label="当前状态">-->
+<!--                </el-table-column>-->
+
+<!--                <el-table-column-->
+<!--                        align="center"-->
+<!--                        label="操作">-->
+
+<!--                    <el-row>-->
+<!--                        <el-button type="primary">修改</el-button>-->
+<!--                        <el-button type="danger">删除</el-button>-->
+<!--                    </el-row>-->
+
+<!--                </el-table-column>-->
+
+<!--            </el-table>-->
+<!--        </template>-->
+
+        <!--分页工具条-->
+<!--        <el-pagination-->
+<!--                @size-change="handleSizeChange"-->
+<!--                @current-change="handleCurrentChange"-->
+<!--                :current-page="currentPage"-->
+<!--                :page-sizes="[5, 10, 15, 20]"-->
+<!--                :page-size="5"-->
+<!--                layout="total, sizes, prev, pager, next, jumper"-->
+<!--                :total="400">-->
+<!--        </el-pagination>-->
+
+    </el-container>
+</el-container>
+
+<!--导入依赖-->
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+
+
+<script>
+
+    new Vue({
+        el: "#chiefPeople",
+
+        mounted() {
+            //页面渲染结束后,发送异步请求,获取数据
+            //   var _this = this;
+            //   axios({
+            //       method:"get",
+            //       url:"http://localhost:8080/brand-case/selectAllServlet"
+            //   }).then(function (resp) {
+            //       _this.tableData = resp.data;
+            //   })
+            this.selectMyTask();
+        },
+        data() {
+            const item = {
+                date: '2016-05-02',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1518 弄'
+            };
+            return {
+                // 当前页码
+                currentPage: 4,
+                // 添加数据对话框是否展示的标记
+                dialogVisible: false,
+
+                // tableData: Array(20).fill(item),
+                //登录表单
+                user: {
+                    username: '',
+                    password: '',
+                },
+                //表单校验
+                // rules: {
+                //     username: [
+                //         {required: true, message: '请输入用户名', trigger: 'blur'},
+                //         {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                //         {validator: validateUserName, trigger: 'blur'}
+                //     ],
+                //     password: [
+                //         {required: true, message: '请输入密码', trigger: 'blur'},
+                //         {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
+                //     ],
+                // },
+
+                // team:{
+                //     teamMemberName:'',
+                //     taskName:'',
+                //     deadline:'',
+                //     status:'',
+                //     level:'',
+                //     id:'',
+                // },
+                //
+                // // 我的任务
+                // myTask: {
+                //     taskName: '',
+                //     level: '',
+                //     deadline: '',
+                //     status: '',
+                //     taskId:'',
+                //     userId:'',
+                //     parentTaskId:'',
+                // },
+
+                myTaskTableData:[{
+                    taskName: '',
+                    level: '',
+                    deadline: '',
+                    status: '',
+                    taskId:'',
+                    userId:'',
+                    parentTaskId:'',
+                }],
+                // 表格数据
+                teamTableData: [{
+                    teamMemberName: '张三',
+                    taskName: '完成登录模块',
+                    deadline: '2022-4-16',
+                    status: "1"
+                },
+                {
+                    teamMemberName: '王五',
+                    taskName: '完成注册模块',
+                    deadline: '2022-4-17',
+                    status: "1"
+                },
+                ]
+            }
+        },
+
+        methods: {
+
+            //分页
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+            },
+
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex === 1) {
+                    return 'warning-row';
+                } else if (rowIndex === 3) {
+                    return 'success-row';
+                }
+                return '';
+            },
+            // 复选框选中后执行的方法
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+
+                console.log(this.multipleSelection)
+            },
+
+
+            //获取我的任务
+            selectMyTask() {
+                //session存了当前登录者的姓名
+                const _this = this;
+                axios({
+                    method:"get",
+                    url:"http://localhost:8080/qg-engineering-management-system/user/selectMyTask"
+                }).then(function (resp) {
+                    if (resp.data.code === 200) {
+                        _this.myTaskTableData = resp.data.data;
+                        //时间转换
+                        _this.myTaskTableData[0].deadline = _this.getMyDate(resp.data.data[0].deadline);
+
+                    }
+                })
+            },
+
+            //时间戳转换为日期
+            getMyDate(str) {
+                var oDate = new Date(str),
+                    oYear = oDate.getFullYear(),
+                    oMonth = oDate.getMonth()+1,
+                    oDay = oDate.getDate(),
+                    oHour = oDate.getHours(),
+                    oMin = oDate.getMinutes(),
+                    oSen = oDate.getSeconds(),
+                    oTime = oYear +'-'+ this.addZero(oMonth) +'-'+ this.addZero(oDay) +' '+ this.addZero(oHour) +':'+
+                        this.addZero(oMin) +':'+this.addZero(oSen);
+                return oTime;
+            },
+
+            //补零操作
+            addZero(num){
+                if(parseInt(num) < 10){
+                    num = '0'+num;
+                }
+                return num;
+            },
+
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const _this = this;
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/user/login",
+                            data: _this.user,
+                        }).then(function (resp) {
+
+                            console.log(resp.data);
+                            console.log(resp.data.code);
+
+                            if (resp.data.code === 200) {
+                                _this.$message({
+                                    message: '登录成功~',
+                                    type: 'success'
+                                });
+                                //通过用户的职位进行页面的跳转
+                                location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
+                            } else if (resp.data.code === 500200) {
+                                _this.$message.error(resp.data.msg);
+                            } else {
+                                _this.$message.error('未知错误,请联系管理员');
+                            }
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
+        },
+    });
+</script>
+
+</body>
+</html>

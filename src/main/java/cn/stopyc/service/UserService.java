@@ -47,4 +47,12 @@ public interface UserService {
      * @return
      */
     Result<User> register(String userName, String password, String email, Integer position);
+
+
+    /**
+     * 通过用户名获取id
+     * @param userName:用户名
+     * @return
+     */
+    Integer getIdByName(String userName);
 }

@@ -14,6 +14,8 @@ public enum ResultEnum {
     REPEAT_NAME(500210,"用户名重复"),
     FIND_USER_FAILED(500220,"用户名不存在"),
     CHECK_CODE_ERROR(500230,"验证码错误"),
+    //任务模块 6002XX
+    NO_TASK(600200,"当前没有任务"),
 
 
     ;

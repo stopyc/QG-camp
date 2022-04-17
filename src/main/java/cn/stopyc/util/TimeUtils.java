@@ -57,17 +57,17 @@ public class TimeUtils {
     }
 
 
-//    /**
-//    * @Description: 处理部落创建时间工具,把date转换为只有日期的格式
-//    * @Param: [signInDate]
-//    * @return: java.lang.String
-//    * @Author: stop.yc
-//    * @Date: 2022/3/25
-//    */
-//    public static String getStrFromDateOfTiber(Date signInDate) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        return sdf.format(signInDate);
-//    }
+    /**
+    * @Description: 处理部落创建时间工具,把date转换为只有日期的格式
+    * @Param: [signInDate]
+    * @return: java.lang.String
+    * @Author: stop.yc
+    * @Date: 2022/3/25
+    */
+    public static String getStrFromDate(Date signInDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(signInDate);
+    }
 //
 //    /**
 //    * @Description: 把通知时间时间格式化为距离现在多长时间

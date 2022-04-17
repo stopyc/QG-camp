@@ -94,4 +94,11 @@ public class UserServiceImpl implements UserService {
             return new Result<>(ResultEnum.DATABASE_ERROR.getCode(),ResultEnum.DATABASE_ERROR.getMsg());
         }
     }
+
+    @Override
+    public Integer getIdByName(String userName) {
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+        User user = userDao.selectByName(userName);
+        return user.getUserId();
+    }
 }
