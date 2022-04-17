@@ -12,7 +12,8 @@ public enum ResultEnum {
     //用户模块 5002XX
     PASSWORD_FAILED(500200,"用户名或密码错误"),
     REPEAT_NAME(500210,"用户名重复"),
-    FIND_USER_FAILED(500220,"用户名不存在");
+    FIND_USER_FAILED(500220,"用户名不存在"),
+    CHECK_CODE_ERROR(500230,"验证码错误"),
 
 
     ;

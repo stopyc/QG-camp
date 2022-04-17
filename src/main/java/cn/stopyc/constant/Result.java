@@ -23,6 +23,10 @@ public class Result<T> {
         super();
     }
 
+    public Result(Integer code) {
+        this.code = code;
+    }
+
     public Result(Integer code, String msg, T data) {
         this.code = code;
         this.msg = msg;

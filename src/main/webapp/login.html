@@ -32,8 +32,8 @@
                 </el-form-item>
 
                 <el-form-item label="用户名:" prop="username">
-                    <el-input v-model="user.username" style="width: 300px;" @blur.native.capture="myOnblur"
-                              :plain="true"></el-input>
+                    <el-input v-model="user.username" style="width: 300px;"
+                              :plain="true"  autocomplete="off"></el-input>
                 </el-form-item>
 
                 <el-form-item label="密码" prop="password">
@@ -49,7 +49,7 @@
                         <div>
                             没有账号?
                             <el-link type="primary"
-                                     >
+                                    href="http://localhost:8080/qg-engineering-management-system/register.html">
                                 注册
                             </el-link>
                         </div>
@@ -71,6 +71,22 @@
     new Vue({
         el: "#loginDiv",
         data() {
+
+            const validateUserName = (rule, value, callback) => {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp)  {
+                    if (resp.data.code === 500220) {
+                        // _this.$message.error(resp.data.msg);
+                        callback(new Error(resp.data.msg));
+                    } else {
+                        callback();
+                    }
+                })
+            };
             return {
                 //登录表单
                 user: {
@@ -80,12 +96,13 @@
                 //表单校验
                 rules: {
                     username: [
-                        {required: true, message: '请输入用户名', trigger: 'onblur'},
-                        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'onblur'}
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                        {validator: validateUserName, trigger: 'blur'}
                     ],
                     password: [
-                        {required: true, message: '请输入密码', trigger: 'onblur'},
-                        {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'onblur'}
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
                     ],
                 }
 
@@ -131,8 +148,8 @@
             },
 
             register(formName) {
-                location.href = "http://localhost:63342/qg-baseservlet-demo/src/main/webapp/register.html";
-                _this.$message.error('师兄,注册还没开始做,验证码一直有bug');
+                location.href = "http://localhost:8080/qg-engineering-management-system/register.html";
+                // _this.$message.error('师兄,注册还没开始做,验证码一直有bug');
             },
             //用户名输入失焦,去看看数据库是否有没有对应的名字
             myOnblur() {

@@ -3,10 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <title>register</title>
+    <style>
+        .center {
+            width: 500px;
+            height: 500px;
+            background-color: gainsboro;
+            border-radius: 5px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    </style>
 
 </head>
 <body>
 
+<div id="login">
+    <el-container class="center">
+        <el-main>
+            <el-form :model="user" :rules="rules" ref="user" label-width="100px" class="demo-ruleForm" id="registerDiv">
+                <el-form-item>
+                    <el-header>欢迎注册</el-header>
+                </el-form-item>
+
+                <el-form-item label="用户名:" prop="username">
+                    <el-input v-model="user.username" style="width: 300px;" @blur.native.capture="myOnblur"
+                              :plain="true"></el-input>
+                </el-form-item>
+
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model="user.password" style="width: 300px;"
+                              autocomplete="off"></el-input>
+                </el-form-item>
+
+                <el-form-item label="确认密码" prop="checkPass">
+                    <el-input type="password" v-model="user.checkPass" style="width: 300px;"
+                              autocomplete="off"></el-input>
+                </el-form-item>
+
+                <el-form-item prop="email" label="邮箱:">
+                    <el-input v-model="user.email" style="width: 300px;"></el-input>
+                </el-form-item>
+
+                <!--                <el-form-item label="验证码:" prop="checkCode">-->
+                <!--                    <el-input v-model="check.checkCode" style="width: 300px;"-->
+                <!--                              autocomplete="off" ></el-input>-->
+                <!--                    <img id="checkCodeImg" src="http://localhost:8080/qg-engineering-management-system/user/checkCode" alt="验证码">-->
+                <!--                    <a href="#" id="changeImg">看不清？</a>-->
+                <!--                </el-form-item>-->
+
+                <template>
+                    <el-form-item label="职位:"  prop="position">
+                        <el-select v-model="user.position" placeholder="请选择您的职位">
+                            <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </template>
+
+                <el-form-item>
+
+                    <template>
+
+                        <el-button type="primary" @click="submitForm('user')" :plain="true">注册</el-button>
+
+                        <el-button @click="resetForm('user')">重置</el-button>
+
+                        <div>
+                            已有账号?
+                            <el-link type="primary"
+                                     href="http://localhost:8080/qg-engineering-management-system/login.html">
+                                登录
+                            </el-link>
+                        </div>
+
+                    </template>
+                </el-form-item>
+
+
+            </el-form>
+        </el-main>
+    </el-container>
+</div>
 
 
 <!--导入依赖-->
@@ -15,6 +99,198 @@
 <script src="element-ui/lib/index.js"></script>
 <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
 
+<script>
+    //创建vue对象
+    new Vue({
+        el: "#registerDiv",
+        data() {
+            //密码校验
+            const validatePass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                } else {
+                    if (this.user.checkPass !== '') {
+                        this.$refs.user.validateField('checkPass');
+                    }
+                    callback();
+                }
+            };
+            //第二次密码输入校验
+            const validatePass2 = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.user.password) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
+            };
+
+            //用户名校验,是否重复
+            const validateUserName = (rule, value, callback) => {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp) {
+                    if (resp.data.code === 500210) {
+                        // _this.$message.error(resp.data.msg);
+                        callback(new Error(resp.data.msg));
+                    } else {
+                        callback();
+                    }
+                })
+            };
+            // const validateCheckCode = (rule,value,callback) =>{
+            //
+            //     const _this = this;
+            //     axios({
+            //         method: "post",
+            //         url: "http://localhost:8080/qg-engineering-management-system/user/checkCode",
+            //         data:_this.check.checkCode
+            //     }).then(function (resp) {
+            //         if (resp.data.code === 500230) {
+            //             callback(new Error(resp.data.msg));
+            //         }else {
+            //             callback();
+            //         }
+            //     })
+            //
+            // }
+
+
+            return {
+                //用户职位选择
+                options: [{
+                    value: '0',
+                    label: '总负责人'
+                }, {
+                    value: '1',
+                    label: '项目经理'
+                }, {
+                    value: '2',
+                    label: '包工头'
+                }, {
+                    value: '3',
+                    label: '小工'
+                }],
+                value: "",
+
+
+                //注册表单
+                user: {
+                    username: '',
+                    password: '',
+                    checkPass: '',
+                    email: '',
+                    position:''
+                },
+
+                userRegister: {
+                    username: '',
+                    password: '',
+                    email: '',
+                    position:''
+                },
+                check: {
+                    checkPass: '',
+                    checkCode: '',
+                },
+                //表单校验
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                        {validator: validateUserName, trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'},
+                        {validator: validatePass, trigger: 'blur'}
+                    ],
+                    checkPass: [
+                        {validator: validatePass2, trigger: 'blur'}
+                    ],
+                    email: [
+                        {required: true, message: '请输入邮箱地址', trigger: 'blur'},
+                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+                    ],
+                    // checkCode: [
+                    //     {validator: validateCheckCode, trigger: 'blur'}
+                    // ]
+                    position: [
+                        {required: true, message: '请选择您的职位', trigger: 'blur'},
+                    ]
+                }
+            }
+        },
+
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        //因为表单校验和需要提交后台的数据不一样,我们另取一个进行封装
+                        this.userRegister.username = this.user.username;
+                        this.userRegister.password = this.user.password;
+                        this.userRegister.email = this.user.email;
+                        this.userRegister.position = this.user.position;
+
+
+                        const _this = this;
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/user/register",
+                            data: _this.userRegister,
+                        }).then(function (resp) {
+
+                            if (resp.data.code === 200) {
+                                _this.$message({
+                                    message: '注册成功~3秒后自动跳转到登录界面',
+                                    type: 'success'
+                                });
+
+                                setTimeout(_this.changeLogin,3000);
+                            } else {
+                                _this.$message.error('未知错误,请联系管理员');
+                            }
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            changeLogin() {
+                location.href = "http://localhost:8080/qg-engineering-management-system/login.html";
+            },
+            //用户名输入失焦,去看看数据库是否有没有对应的名字
+            myOnblur() {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp) {
+                    if (resp.data.code === 500210) {
+                        _this.$message.error(resp.data.msg);
+                    }
+                })
+            },
+        },
+    });
+    //
+    // document.getElementById("changeImg").onclick = function () {
+    //     var time = new Date().getMilliseconds();
+    //     document.getElementById("checkCodeImg").src = "http://localhost:8080/qg-engineering-management-system/user/checkCode?"+time;
+    // }
+
+</script>
 
 </body>
 </html>

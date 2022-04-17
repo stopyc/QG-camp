@@ -27,4 +27,24 @@ public interface UserService {
      * @return
      */
     Result<User> select(String userName);
+
+
+    /**
+     * 验证码校验
+     * @param checkCode:用户输入
+     * @param checkCodeGen:生成的
+     * @return
+     */
+    Result checkCheckCode(String checkCode,String checkCodeGen);
+
+
+    /**
+     * 用户注册
+     * @param userName:姓名
+     * @param password:密码
+     * @param email:邮箱
+     * @param position:职位
+     * @return
+     */
+    Result<User> register(String userName, String password, String email, Integer position);
 }

@@ -26,4 +26,16 @@ public interface UserDao {
      * @return
      */
     User selectByName(String userName);
+
+    /**
+     * 新增一个用户
+     * @param userName:名字
+     * @param password:密码
+     * @param email:邮箱
+     * @param position:职位
+     * @param gender:性别
+     * @param hireDate:入职时间
+     * @return
+     */
+    int insertNewOne(String userName, String password, String email, Integer position,String gender,String hireDate);
 }

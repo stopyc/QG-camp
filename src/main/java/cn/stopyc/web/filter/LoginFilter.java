@@ -17,7 +17,7 @@ public class LoginFilter implements Filter {
 
 
         //不需要拦截的地址
-        String[] urls = {"/login.html","user","/js/","/element-ui/"};
+        String[] urls = {"/login.html","user","/js/","/element-ui/","/register.html"};
         //请求的地址
         String url = request.getRequestURL().toString();
         System.out.println(url);

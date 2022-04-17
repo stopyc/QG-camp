@@ -28,4 +28,12 @@ public class UserDaoImpl implements UserDao {
         String sql = "select * from `t_user` where `userName`=?";
         return CRUDUtils.query(sql,new BeanHandler<>(User.class),userName);
     }
+
+    @Override
+    public int insertNewOne(String userName, String password, String email, Integer position,String gender,String hireDate) {
+
+        String sql = "insert into `t_user` (`userName`,`password`,`position`,`email`,`gender`,`hireDate`) " +
+                "values (?,?,?,?,?,?)";
+        return CRUDUtils.update(sql,userName,password,position,email,gender,hireDate);
+    }
 }

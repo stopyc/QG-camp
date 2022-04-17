@@ -43,6 +43,8 @@ public class UserServlet extends BaseServlet{
     */
     public void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        System.out.println("我是login");
+
         resp.setContentType("text/json;charset=utf-8");
 
         //1.获取前端数据(post)请求体
@@ -64,9 +66,10 @@ public class UserServlet extends BaseServlet{
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
         try {
+//            String contextPath = req.getContextPath();
+//            resp.sendRedirect(contextPath+"/user/*");
+            userResult.getData().setPassword("");
             JsonUtil.toJson(userResult,resp);
-            String contextPath = req.getContextPath();
-            resp.sendRedirect(contextPath+"/user/*");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,53 +77,52 @@ public class UserServlet extends BaseServlet{
 
 
 
-    public void register(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        request.setCharacterEncoding("UTF-8");
+    public void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
 //        //获取用户名,密码,验证码
-//        String username = request.getParameter("username");
-//        String password = request.getParameter("password");
-//        String checkCode = request.getParameter("checkCode");
+
+        //1.获取前端数据(post)请求体
+        BufferedReader reader = req.getReader();
+        String userStr = reader.readLine();
+        User user = JSON.parseObject(userStr, User.class);
 //
-//        UserServiceImpl userService = SingletonFactory.getUserServiceSingleton();
-//        Result<User> userResult = userService.register(username, password);
-//
-//        //获取session中的验证码信息
-//        HttpSession session = request.getSession();
-//        String  checkCodeGen = (String) session.getAttribute("checkCodeGen");
-//
-//        response.setContentType("text/html;charset=utf-8");
-//        //进行比对,比对失败
-//        if (!checkCodeGen.equalsIgnoreCase(checkCode)) {
-////            System.out.println("验证码输入错误");
-//            request.getRequestDispatcher("/register.html").forward(request,response);
-//            return;
-//        }
-//
-//        //5.写
-//        PrintWriter writer = response.getWriter();
-//
-////        System.out.println("验证码输入正确");
-//        if (userResult.getCode().equals(ResultEnum.SUCCESS.getCode())) {
-//            //注册成功~
-//
-//            System.out.println("注册成功~");
-//            request.setAttribute("user",userResult.getData());
-//            request.getRequestDispatcher("/login.html").forward(request,response);
-//        }else {
-//            writer.write(userResult.getMsg());
-//        }
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+        Result<User> registerResult = userService.register(StringUtil.getTrimStr(user.getUserName()), Md5Utils.getMD5(user.getPassword()),user.getEmail(),user.getPosition());
+
+        //5.封装结果集成json对象,返回前端,前端通过code,判断注册情况
+        try {
+            JsonUtil.toJson(registerResult,resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void checkCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
+
+        response.setContentType("text/json;charset=utf-8");
+
+        //1.获取前端数据(post)请求体
+        BufferedReader reader = request.getReader();
+        String checkCode = reader.readLine();
+
         //字节输出流,响应到页面
         ServletOutputStream os = response.getOutputStream();
-//        OutputStream fos = new FileOutputStream("d://a.jpg");
+
         //生成验证码图片和信息
-        String checkCode = CheckCodeUtil.outputVerifyImage(100, 50, os, 4);
-        System.out.println(checkCode);
-        //获取session对象,进行保存验证码
-        session.setAttribute("checkCodeGen",checkCode);
+        String checkCodeGen = CheckCodeUtil.outputVerifyImage(100, 50, os, 4);
+
+//        //3.获取service对象
+//        UserService userService = SingletonFactory.getUserServiceSingleton();
+//
+//        //4.调用service层的登录功能,获取处理结果集(通过名字和密码进行登录)
+//        Result checkResult = userService.checkCheckCode(checkCode,checkCodeGen);
+//
+//        //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
+//        try {
+//            JsonUtil.toJson(checkResult,response);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -153,6 +155,8 @@ public class UserServlet extends BaseServlet{
             e.printStackTrace();
         }
     }
+
+
 }
 
 
