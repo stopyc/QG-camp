@@ -26,7 +26,6 @@ public class JsonUtil {
         String json = JSONObject.toJSONString(result, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullNumberAsZero, SerializerFeature.WriteNullListAsEmpty, SerializerFeature.WriteNullStringAsEmpty, SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.DisableCircularReferenceDetect);
 
         writer.write(json);
-        System.out.println("传入的"+json);
         writer.close();
     }
 }

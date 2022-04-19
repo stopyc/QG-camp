@@ -15,6 +15,30 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
+
+            /*background: rgba(41, 39, 39, 0.46);*/
+            /*-webkit-box-shadow: 0px 35px 44px -22px rgba(0,0,0,0.72);*/
+            /*-moz-box-shadow: 0px 35px 44px -22px rgba(0,0,0,0.72);*/
+            /*box-shadow: 0px 35px 44px -22px #1f181b;*/
+            /*padding: 60px 40px;*/
+
+        }
+        body {
+            font-family:Verdana;
+
+
+            width: 100%;
+            text-transform: uppercase;
+            background: #fff;
+            background-attachment: fixed;
+            background: url(img/bg.jfif) no-repeat 0px 0px;
+            background-size: cover;
+            -webkit-background-size: cover;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+
+            /*text-align: center;*/
         }
 
     </style>
@@ -128,7 +152,7 @@
                                     type: 'success'
                                 });
                                 //通过用户的职位进行页面的跳转
-                                setTimeout(_this.changeMain,3000);
+                                setTimeout(_this.changeMain,2000);
 
                             } else if (resp.data.code === 500200) {
                                 _this.$message.error(resp.data.msg);

@@ -38,4 +38,31 @@ public interface UserDao {
      * @return
      */
     int insertNewOne(String userName, String password, String email, Integer position,String gender,String hireDate);
+
+    /**
+     * 通过用户id获取用户
+     * @param idByName:用户id
+     * @return
+     */
+    User getUserByUserId(Integer idByName);
+
+    /**通过任务id获取用户
+     *
+     * @param taskId
+     * @return
+     */
+    User getUserByTaskId(String taskId);
+
+    /**
+     * 删除用户的任务
+     * @param taskId
+     */
+    void deleteTask(Integer taskId);
+
+    /**
+     * 添加用户任务
+     * @param taskId:任务id
+     * @param userId:用户id
+     */
+    void addTaskId(int taskId, int userId);
 }

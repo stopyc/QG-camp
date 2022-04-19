@@ -65,7 +65,7 @@ public class TimeUtils {
     * @Date: 2022/3/25
     */
     public static String getStrFromDate(Date signInDate) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(signInDate);
     }
 //

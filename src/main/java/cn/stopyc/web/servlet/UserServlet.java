@@ -56,7 +56,6 @@ public class UserServlet extends BaseServlet{
         String userStr = reader.readLine();
         User user = JSON.parseObject(userStr, User.class);
 
-        System.out.println("user"+user);
         //2.删掉用户可能输入的两端空格,以及用户信息加密
         user.setUserName(StringUtil.getTrimStr(user.getUserName()));
         user.setPassword(Md5Utils.getMD5(user.getPassword()));
@@ -70,9 +69,6 @@ public class UserServlet extends BaseServlet{
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
         try {
-//            String contextPath = req.getContextPath();
-//            resp.sendRedirect(contextPath+"/user/*");
-//            userResult.getData().setPassword("");
             HttpSession session = req.getSession();
             session.setAttribute("username",user.getUserName());
             JsonUtil.toJson(userResult,resp);
@@ -147,49 +143,14 @@ public class UserServlet extends BaseServlet{
         String userStr = reader.readLine();
         User user = JSON.parseObject(userStr, User.class);
 
-        System.out.println("onblur  "+user);
         //2.获取service对象
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
         //3.获取处理结果集
         Result<User> userResult = userService.select(StringUtil.getTrimStr(user.getUserName()));
 
-        System.out.println("code  "+userResult.getCode());
         try {
             JsonUtil.toJson(userResult,resp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-    * @Description: 获取当前用户的任务
-    * @Param: [req, resp]
-    * @return: void
-    * @Author: stop.yc
-    * @Date: 2022/4/17
-    */
-    public void selectMyTask(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        HttpSession session = req.getSession();
-        String  username = (String) session.getAttribute("username");
-
-        //2.获取userService对象
-        UserService userService = SingletonFactory.getUserServiceSingleton();
-
-        //3.获取当前用户的id
-        Integer idByName = userService.getIdByName(username);
-
-        //5.获取taskService对象
-        TaskService taskService = SingletonFactory.getTaskServiceSingleton();
-
-        //6.获取用户下的任务,并封装成对象返回来
-        Result<List<Task>> taskResult = taskService.getTaskByUserId(idByName);
-
-        System.out.println(taskResult.getData().get(0));
-        //7.返回结果集
-        try {
-            JsonUtil.toJson(taskResult,resp);
         } catch (Exception e) {
             e.printStackTrace();
         }

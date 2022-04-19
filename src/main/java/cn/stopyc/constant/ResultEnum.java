@@ -16,6 +16,8 @@ public enum ResultEnum {
     CHECK_CODE_ERROR(500230,"验证码错误"),
     //任务模块 6002XX
     NO_TASK(600200,"当前没有任务"),
+    INCOMPLETE_TASK(600210,"任务未完成"),
+    HAS_TASK(600220,"当前已有任务"),
 
 
     ;

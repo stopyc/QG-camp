@@ -101,4 +101,5 @@ public class UserServiceImpl implements UserService {
         User user = userDao.selectByName(userName);
         return user.getUserId();
     }
+
 }

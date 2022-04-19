@@ -55,4 +55,5 @@ public interface UserService {
      * @return
      */
     Integer getIdByName(String userName);
+
 }

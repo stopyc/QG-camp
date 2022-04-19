@@ -36,4 +36,30 @@ public class UserDaoImpl implements UserDao {
                 "values (?,?,?,?,?,?)";
         return CRUDUtils.update(sql,userName,password,position,email,gender,hireDate);
     }
+
+    @Override
+    public User getUserByUserId(Integer idByName) {
+        String sql = "select * from `t_user` where `userId`=?";
+        return  CRUDUtils.query(sql,new BeanHandler<>(User.class),idByName);
+    }
+
+    @Override
+    public User getUserByTaskId(String taskId) {
+        String sql = "select * from `t_user` where `taskId`=?";
+        return CRUDUtils.query(sql,new BeanHandler<>(User.class),taskId);
+    }
+
+    @Override
+    public void deleteTask(Integer taskId) {
+        String sql = "update `t_user` set `taskId`=0 where `taskId`=?";
+        CRUDUtils.update(sql,taskId);
+    }
+
+    @Override
+    public void addTaskId(int taskId, int userId) {
+        String sql = "update `t_user` set `taskId`=? where `userId`=?";
+        CRUDUtils.update(sql,taskId,userId);
+    }
+
+
 }

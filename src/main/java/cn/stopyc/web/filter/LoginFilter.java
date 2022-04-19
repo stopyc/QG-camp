@@ -17,14 +17,12 @@ public class LoginFilter implements Filter {
         resp.setContentType("text/json;charset=utf-8");
 
         //不需要拦截的地址
-        String[] urls = {"/login.html","user","/js/","/element-ui/","/register.html"};
+        String[] urls = {"/login.html","user","/js/","/element-ui/","/register.html","/img/"};
         //请求的地址
         String url = request.getRequestURL().toString();
-        System.out.println(url);
         for (String s : urls) {
             if (url.contains(s)) {
                 chain.doFilter(req,resp);
-                System.out.println("没有拦截");
                 return;
             }
         }
@@ -32,14 +30,11 @@ public class LoginFilter implements Filter {
         HttpSession session = request.getSession();
         Object user = session.getAttribute("username");
 
-        System.out.println(user);
         if (user == null) {
             //没有就拦截,回退到登录页面
-            System.out.println("执行回退");
             request.getRequestDispatcher("/login.html").forward(request,resp);
         }else {
             //登录过了,就放行
-            System.out.println(user+"您已登录");
             chain.doFilter(req, resp);
         }
     }

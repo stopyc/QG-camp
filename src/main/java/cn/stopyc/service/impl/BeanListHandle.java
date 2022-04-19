@@ -25,6 +25,7 @@ public class BeanListHandle<T> implements IResultSetHandler<List<T>> {
 
     @Override
     public List<T> handle(ResultSet rs) throws Exception {
+
         //通过字节码信息获取类的信息
         BeanInfo beanInfo = Introspector.getBeanInfo(clazz, Object.class);
         //再通过类获取属性描述器,比如getter,setter这些
@@ -45,6 +46,6 @@ public class BeanListHandle<T> implements IResultSetHandler<List<T>> {
             list.add(obj);
         }
         return list;
-
     }
+
 }

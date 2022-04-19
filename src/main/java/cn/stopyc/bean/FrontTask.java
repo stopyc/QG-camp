@@ -1,4 +1,4 @@
-package cn.stopyc.po;
+package cn.stopyc.bean;
 
 
 import java.util.Date;
@@ -9,7 +9,7 @@ import java.util.Date;
  * @author: stop.yc
  * @create: 2022-04-17 22:32
  **/
-public class Task {
+public class FrontTask {
 
     /**
      * 任务id
@@ -39,8 +39,13 @@ public class Task {
      * 任务完成状态
      */
     private Integer status;
+    /**
+     * 任务完成情况
+     */
+    private String allTaskCount;
 
-    public Task(Integer taskId, String taskName, Integer userId, Integer level, Date deadline, Integer parentTaskId, Integer status, Integer generalId) {
+
+    public FrontTask(Integer taskId, String taskName, Integer userId, Integer level, Date deadline, Integer parentTaskId, Integer status, String allTaskCount) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.userId = userId;
@@ -48,12 +53,12 @@ public class Task {
         this.deadline = deadline;
         this.parentTaskId = parentTaskId;
         this.status = status;
-        this.generalId = generalId;
+        this.allTaskCount = allTaskCount;
     }
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "FrontTask{" +
                 "taskId=" + taskId +
                 ", taskName='" + taskName + '\'' +
                 ", userId=" + userId +
@@ -61,20 +66,17 @@ public class Task {
                 ", deadline=" + deadline +
                 ", parentTaskId=" + parentTaskId +
                 ", status=" + status +
-                ", generalId=" + generalId +
+                ", allTaskCount='" + allTaskCount + '\'' +
                 '}';
     }
 
-    public Integer getGeneralId() {
-        return generalId;
+    public String getAllTaskCount() {
+        return allTaskCount;
     }
 
-    public void setGeneralId(Integer generalId) {
-        this.generalId = generalId;
+    public void setAllTaskCount(String allTaskCount) {
+        this.allTaskCount = allTaskCount;
     }
-
-    private Integer generalId;
-
 
     public Integer getTaskId() {
         return taskId;
@@ -132,7 +134,7 @@ public class Task {
         this.status = status;
     }
 
-    public Task(Integer taskId, String taskName, Integer userId, Integer level, Date deadline, Integer parentTaskId, Integer status) {
+    public FrontTask(Integer taskId, String taskName, Integer userId, Integer level, Date deadline, Integer parentTaskId, Integer status) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.userId = userId;
@@ -142,6 +144,6 @@ public class Task {
         this.status = status;
     }
 
-    public Task() {
+    public FrontTask() {
     }
 }
