@@ -2,6 +2,8 @@ package cn.stopyc.dao;
 
 import cn.stopyc.po.User;
 
+import java.util.List;
+
 /**
 * @Description: 用户dao类接口
 * @Param:
@@ -65,4 +67,11 @@ public interface UserDao {
      * @param userId:用户id
      */
     void addTaskId(int taskId, int userId);
+
+    /**
+     * 根据上级id获取用户集合
+     * @param bossId
+     * @return
+     */
+    List<User> selectUsersByBossId(Integer bossId);
 }

@@ -1,7 +1,9 @@
 package cn.stopyc.service;
 
+import cn.stopyc.bean.MyTeam;
 import cn.stopyc.constant.Result;
 import cn.stopyc.po.Task;
+import cn.stopyc.po.User;
 
 import java.util.List;
 
@@ -45,4 +47,12 @@ public interface TaskService {
      * @return
      */
     Result add(Task task,int userId);
+
+
+    /**
+     * 通过用户集合,获取任务集合
+     * @param users:用户集合
+     * @return
+     */
+    List<Task> getTasksByUsers(List<User> users);
 }

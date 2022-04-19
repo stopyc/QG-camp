@@ -4,7 +4,6 @@ import cn.stopyc.bean.SingletonFactory;
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
 import cn.stopyc.po.Task;
-import cn.stopyc.po.User;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
 import cn.stopyc.util.JsonUtil;
@@ -13,7 +12,6 @@ import com.alibaba.fastjson.JSON;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -56,7 +54,7 @@ public class TaskServlet extends BaseServlet {
         Result<List<Task>> taskResult = taskService.getTaskByUserId(idByName);
 
         //7.返回结果集
-        toJsonString(taskResult,resp);
+        JsonUtil.toJson(taskResult,resp);
     }
 
     /**
@@ -79,7 +77,7 @@ public class TaskServlet extends BaseServlet {
         Result taskResult = taskService. getTaskCompleteByUserId(Integer.parseInt(userId));
 
         //4.返回结果集
-        toJsonString(taskResult,resp);
+        JsonUtil.toJson(taskResult,resp);
     }
 
     /**
@@ -95,20 +93,14 @@ public class TaskServlet extends BaseServlet {
         BufferedReader reader = req.getReader();
         String taskId = reader.readLine();
 
-        //2.判断是否当前有任务
-        Result taskResult;
-        if (StringUtil.isEmpty(taskId)) {
-            taskResult = new Result(ResultEnum.NO_TASK.getCode(),ResultEnum.NO_TASK.getMsg());
-        }else {
-            //有任务
-            //3.获取taskService对象
-            TaskService taskService = SingletonFactory.getTaskServiceSingleton();
-            //4.调用完成方法
-            taskResult = taskService.ok(taskId);
-        }
+        //2.获取taskService对象
+        TaskService taskService = SingletonFactory.getTaskServiceSingleton();
 
-        //5.返回结果集
-        toJsonString(taskResult,resp);
+        //3.调用完成方法
+        Result taskResult = taskService.ok(taskId);
+
+        //4.返回结果集
+        JsonUtil.toJson(taskResult,resp);
     }
 
     /**
@@ -123,6 +115,7 @@ public class TaskServlet extends BaseServlet {
         //1.接受数据,并转换成java对象
         BufferedReader reader = req.getReader();
         String addTask = reader.readLine();
+        //你要添加的任务对象
         Task task = JSON.parseObject(addTask, Task.class);
 
         //2.获取是谁在添加任务
@@ -134,29 +127,14 @@ public class TaskServlet extends BaseServlet {
 
         //4.获取当前用户的id
         Integer idByName = userService.getIdByName(username);
-        System.out.println("idbyname"+idByName);
+
         //5.获取taskService对象
         TaskService taskService = SingletonFactory.getTaskServiceSingleton();
-        //6.调用方法
+
+        //6.调用添加方法
         Result taskResult = taskService.add(task, idByName);
 
-        //4.返回结果集
-        toJsonString(taskResult,resp);
-    }
-
-
-    /**
-    * @Description: 返回前端json对象
-    * @Param: [rs, resp]
-    * @return: void
-    * @Author: stop.yc
-    * @Date: 2022/4/19
-    */
-    private void toJsonString(Result rs,HttpServletResponse resp) {
-        try {
-            JsonUtil.toJson(rs,resp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //7.返回结果集
+        JsonUtil.toJson(taskResult,resp);
     }
 }

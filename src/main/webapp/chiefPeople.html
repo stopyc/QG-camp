@@ -18,63 +18,23 @@
 </head>
 <body>
 
-
+<!--侧边-->
 <el-container style="height: 800px; border: 1px solid #eee" id="chiefPeople">
+    <!--            三个边栏-->
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
         <el-menu :default-openeds="['1', '3']">
-            <!--            <el-submenu index="1">-->
-            <!--                <template slot="title"><i class="el-icon-message"></i>导航一</template>-->
+
             <el-menu-item index="1">管理团队</el-menu-item>
-            <!--                <el-menu-item-group>-->
-            <!--                    <template slot="title">分组一</template>-->
-            <!--                    <el-menu-item index="1-1">选项1</el-menu-item>-->
-            <!--                    <el-menu-item index="1-2">选项2</el-menu-item>-->
-            <!--                </el-menu-item-group>-->
-            <!--                <el-menu-item-group title="分组2">-->
-            <!--                    <el-menu-item index="1-3">选项3</el-menu-item>-->
-            <!--                </el-menu-item-group>-->
-            <!--                <el-submenu index="1-4">-->
-            <!--                    <template slot="title">选项4</template>-->
-            <!--                    <el-menu-item index="1-4-1">选项4-1</el-menu-item>-->
-            <!--                </el-submenu>-->
-            <!--            </el-submenu>-->
+
             <el-menu-item index="2">个人信息</el-menu-item>
-            <!--            <el-submenu index="2">-->
-            <!--                <template slot="title"><i class="el-icon-menu"></i>导航二</template>-->
-            <!--                <el-menu-item-group>-->
-            <!--                    <template slot="title">分组一</template>-->
-            <!--                    <el-menu-item index="2-1">选项1</el-menu-item>-->
-            <!--                    <el-menu-item index="2-2">选项2</el-menu-item>-->
-            <!--                </el-menu-item-group>-->
-            <!--                <el-menu-item-group title="分组2">-->
-            <!--                    <el-menu-item index="2-3">选项3</el-menu-item>-->
-            <!--                </el-menu-item-group>-->
-            <!--                <el-submenu index="2-4">-->
-            <!--                    <template slot="title">选项4</template>-->
-            <!--                    <el-menu-item index="2-4-1">选项4-1</el-menu-item>-->
-            <!--                </el-submenu>-->
-            <!--            </el-submenu>-->
+
             <el-menu-item index="3">消息通知</el-menu-item>
-            <!--            <el-submenu index="3">-->
-            <!--                <template slot="title"><i class="el-icon-setting"></i>导航三</template>-->
-            <!--                <el-menu-item-group>-->
-            <!--                    <template slot="title">分组一</template>-->
-            <!--                    <el-menu-item index="3-1">选项1</el-menu-item>-->
-            <!--                    <el-menu-item index="3-2">选项2</el-menu-item>-->
-            <!--                </el-menu-item-group>-->
-            <!--                <el-menu-item-group title="分组2">-->
-            <!--                    <el-menu-item index="3-3">选项3</el-menu-item>-->
-            <!--                </el-menu-item-group>-->
-            <!--                <el-submenu index="3-4">-->
-            <!--                    <template slot="title">选项4</template>-->
-            <!--                    <el-menu-item index="3-4-1">选项4-1</el-menu-item>-->
-            <!--                </el-submenu>-->
-            <!--            </el-submenu>-->
         </el-menu>
     </el-aside>
 
-
+    <!--    内容-->
     <el-container>
+        <!--        页头-->
         <el-header style="text-align: right; font-size: 12px">
             <el-dropdown>
                 <i class="el-icon-setting" style="margin-right: 15px"></i>
@@ -87,7 +47,7 @@
             <span>王小虎</span>
         </el-header>
 
-        <!--        任务列表-->
+        <!--        我的任务列表-->
         <el-form :inline="true" :model="myTaskTableData" class="myTaskTableData">
             <template>
 
@@ -160,7 +120,8 @@
             </template>
         </el-form>
 
-        <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+        <!--        添加任务的对话框-->
+        <el-dialog title="添加任务" :visible.sync="dialogFormVisible">
             <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
                 <el-form-item label="任务名称" prop="taskName">
                     <el-input v-model="addTask.taskName" autocomplete="off"></el-input>
@@ -177,109 +138,112 @@
                     <el-col class="line" :span="2">-</el-col>
 
                 </el-form-item>
-                    <el-button id="addButton" type="primary" @click="addSubmit('addTask')" :loading="false">添加</el-button>
-                    <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button id="addButton" type="primary" @click="addSubmit('addTask')" :loading="false">添加</el-button>
+                <el-button @click="dialogFormVisible = false">取消</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
 
-        <!--        &lt;!&ndash;        我的队伍-表头&ndash;&gt;-->
-        <!--        <el-form :inline="true" :model="team" class="demo-form-inline">-->
+        <!--        我的队伍-表头-->
+        <el-form :inline="true" :model="teamTableData" class="teamTableData">
 
-        <!--            &lt;!&ndash;        我的队伍-内容&ndash;&gt;-->
-        <!--            <template>-->
-        <!--                <el-table-->
-        <!--                        :data="teamTableData"-->
-        <!--                        style="width: 100%"-->
-        <!--                        :row-class-name="tableRowClassName"-->
-        <!--                        @selection-change="handleSelectionChange"-->
-        <!--                >-->
-        <!--                    <el-table-column-->
-        <!--                            type="selection"-->
-        <!--                            width="55">-->
-        <!--                    </el-table-column>-->
-        <!--                    <el-table-column-->
-        <!--                            type="index"-->
-        <!--                            width="50">-->
-        <!--                    </el-table-column>-->
+            <!--        我的队伍-内容-->
+            <template>
+                <el-table
+                        :data="teamTableData"
+                        style="width: 100%"
+                        :row-class-name="tableRowClassName"
+                        @selection-change="handleSelectionChange"
+                        highlight-current-row
+                        @current-change="handleCurrentChange"
+                >
+                    <el-table-column
+                            type="selection"
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            type="index"
+                            width="50">
+                    </el-table-column>
 
-        <!--                    <el-table-column-->
-        <!--                            prop="teamMemberName"-->
-        <!--                            label="人员"-->
-        <!--                            align="center"-->
-        <!--                            width=60"-->
-        <!--                    >-->
-        <!--                    </el-table-column>-->
+                    <el-table-column
+                            prop="teamMemberName"
+                            label="人员"
+                            align="center"
+                            width="60"
+                    >
+                    </el-table-column>
 
-        <!--                    <el-table-column-->
-        <!--                            prop="taskName"-->
-        <!--                            label="任务"-->
-        <!--                            align="center"-->
-        <!--                    >-->
-        <!--                    </el-table-column>-->
+                    <el-table-column
+                            prop="taskName"
+                            label="任务"
+                            align="center"
+                    >
+                    </el-table-column>
 
-        <!--                    <el-table-column-->
-        <!--                            prop="level"-->
-        <!--                            label="难度"-->
-        <!--                            align="center"-->
-        <!--                            width="50"-->
-        <!--                    >-->
-        <!--                    </el-table-column>-->
+                    <el-table-column
+                            prop="level"
+                            label="难度"
+                            align="center"
+                            width="50"
+                            :formatter="levelFormatter"
+                    >
+                    </el-table-column>
 
-        <!--                    <el-table-column-->
-        <!--                            prop="deadline"-->
-        <!--                            label="截止日期"-->
-        <!--                            align="center"-->
-        <!--                    >-->
-        <!--                    </el-table-column>-->
+                    <el-table-column
+                            prop="deadline"
+                            label="截止日期"
+                            align="center"
+                    >
+                    </el-table-column>
 
-        <!--                    <el-table-column-->
-        <!--                            prop="status"-->
-        <!--                            label="当前状态"-->
-        <!--                            align="center"-->
-        <!--                            width="60"-->
-        <!--                    >-->
-        <!--                    </el-table-column>-->
+                    <el-table-column
+                            prop="status"
+                            label="当前状态"
+                            align="center"
+                            width="60"
+                            :formatter="statusFormatter"
+                    >
+                    </el-table-column>
 
-        <!--                    <el-table-column-->
-        <!--                            align="center"-->
-        <!--                            label="操作">-->
+                    <el-table-column
+                            align="center"
+                            label="操作">
 
-        <!--                        <el-row>-->
-        <!--                            <el-button type="primary">添加任务</el-button>-->
-        <!--                            <el-button type="success">查看</el-button>-->
-        <!--                            <el-button type="danger">删除</el-button>-->
-        <!--                        </el-row>-->
+                        <el-row>
+                            <el-button type="primary">添加任务</el-button>
+                            <el-button type="success">查看</el-button>
+                            <el-button type="danger">删除</el-button>
+                        </el-row>
 
-        <!--                    </el-table-column>-->
+                    </el-table-column>
 
-        <!--                </el-table>-->
-        <!--            </template>-->
+                </el-table>
+            </template>
+        </el-form>
 
-        <!--        </el-form>-->
+<!--        &lt;!&ndash;查询列表-表头&ndash;&gt;-->
+<!--        <el-form :inline="true" :model="team" class="demo-form-inline">-->
 
-        <!--        &lt;!&ndash;查询列表-表头&ndash;&gt;-->
-        <!--        <el-form :inline="true" :model="team" class="demo-form-inline">-->
+<!--            <el-form-item label="当前状态">-->
+<!--                <el-select v-model="team.status" placeholder="当前状态">-->
+<!--                    <el-option label="启用" value="1"></el-option>-->
+<!--                    <el-option label="禁用" value="0"></el-option>-->
+<!--                </el-select>-->
+<!--            </el-form-item>-->
 
-        <!--            <el-form-item label="当前状态">-->
-        <!--                <el-select v-model="team.status" placeholder="当前状态">-->
-        <!--                    <el-option label="启用" value="1"></el-option>-->
-        <!--                    <el-option label="禁用" value="0"></el-option>-->
-        <!--                </el-select>-->
-        <!--            </el-form-item>-->
+<!--            <el-form-item label="企业名称">-->
+<!--                <el-input v-model="team.taskName" placeholder="企业名称"></el-input>-->
+<!--            </el-form-item>-->
 
-        <!--            <el-form-item label="企业名称">-->
-        <!--                <el-input v-model="team.taskName" placeholder="企业名称"></el-input>-->
-        <!--            </el-form-item>-->
+<!--            <el-form-item label="品牌名称">-->
+<!--                <el-input v-model="team.taskName" placeholder="品牌名称"></el-input>-->
+<!--            </el-form-item>-->
 
-        <!--            <el-form-item label="品牌名称">-->
-        <!--                <el-input v-model="team.taskName" placeholder="品牌名称"></el-input>-->
-        <!--            </el-form-item>-->
-
-        <!--            <el-form-item>-->
-        <!--                <el-button type="primary" @click="submitForm(team)">查询</el-button>-->
-        <!--            </el-form-item>-->
-        <!--        </el-form>-->
+<!--            <el-form-item>-->
+<!--                <el-button type="primary" @click="submitForm(team)">查询</el-button>-->
+<!--            </el-form-item>-->
+<!--        </el-form>-->
         <!--查询列表-内容-->
         <!--        <template>-->
         <!--            <el-table-->
@@ -346,7 +310,9 @@
         <!--        </el-pagination>-->
 
     </el-container>
+
 </el-container>
+
 
 <!--导入依赖-->
 <script src="js/vue.js"></script>
@@ -363,6 +329,7 @@
         mounted() {
             //页面渲染结束后,发送异步请求,获取数据
             this.selectMyTask();
+            this.selectMyTeam();
 
         },
         data() {
@@ -375,13 +342,11 @@
                 //添加表单
                 dialogFormVisible: false,
 
-
                 // 当前页码
                 currentPage: 4,
                 // 添加数据对话框是否展示的标记
                 dialogVisible: false,
 
-                // tableData: Array(20).fill(item),
                 //登录表单
                 user: {
                     username: '',
@@ -397,7 +362,8 @@
                     ],
                 },
 
-                addTask:{
+
+                addTask: {
                     taskName: '',
                     level: '0',
                     deadline: '',
@@ -421,30 +387,19 @@
                     generalId: '',
                 }],
 
-                // 表格数据
+                // 队伍数据
                 teamTableData: [{
-                    teamMemberName: '张三',
-                    taskName: '完成登录模块',
-                    deadline: '2022-4-16',
-                    status: "1"
-                }, {
-                    teamMemberName: '王五',
-                    taskName: '完成注册模块',
-                    deadline: '2022-4-17',
-                    status: "1"
+                    teamMemberName: '',
+                    taskName: '',
+                    level: '',
+                    deadline: '',
+                    status: '',
+                    userId: '',
+                    taskId: '',
                 }],
+
                 currentRow: null,
 
-                form: {
-                    name: '',
-                    region: '',
-                    date1: '',
-                    date2: '',
-                    delivery: false,
-                    type: [],
-                    resource: '',
-                    desc: ''
-                },
                 onSubmit() {
                     console.log('submit!');
                 }
@@ -452,6 +407,26 @@
         },
 
         methods: {
+
+            //获取我的队伍的信息
+            selectMyTeam() {
+                //session存了当前登录者的姓名
+                const _this = this;
+                let len, j;
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam"
+                }).then(function (resp) {
+                    if (resp.data.code === 200) {
+                        _this.teamTableData = resp.data.data;
+                        for (j = 0, len = _this.teamTableData.length; j < len; j++) {
+                            //时间转换
+                            _this.teamTableData[j].deadline = _this.getMyDate(resp.data.data[j].deadline);
+                        }
+                    }
+                })
+
+            },
 
             //添加表单
             addSubmit(formName) {
@@ -467,7 +442,7 @@
                             data: _this.addTask,
                         }).then(function (resp) {
                             if (resp.data.code === 200) {
-                                document.getElementById("addButton").disabled=true;
+                                document.getElementById("addButton").disabled = true;
 
                                 _this.dialogFormVisible = false;
                                 _this.$message.success("任务添加成功");
@@ -531,11 +506,12 @@
             refresh() {
                 location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
             },
+
             handleCurrentChange(val) {
                 this.currentRow = val;
             },
 
-            //任务难度格式化
+            //任务完成状态格式化
             statusFormatter(row, column) {
                 const status = row.status
                 if (status === 0) {
@@ -571,6 +547,7 @@
                 }
                 return '';
             },
+
             // 复选框选中后执行的方法
             handleSelectionChange(val) {
                 this.multipleSelection = val;
@@ -618,38 +595,38 @@
                 return num;
             },
 
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        const _this = this;
-                        axios({
-                            method: "post",
-                            url: "http://localhost:8080/qg-engineering-management-system/user/login",
-                            data: _this.user,
-                        }).then(function (resp) {
-
-                            console.log(resp.data);
-                            console.log(resp.data.code);
-
-                            if (resp.data.code === 200) {
-                                _this.$message({
-                                    message: '登录成功~',
-                                    type: 'success'
-                                });
-                                //通过用户的职位进行页面的跳转
-                                location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
-                            } else if (resp.data.code === 500200) {
-                                _this.$message.error(resp.data.msg);
-                            } else {
-                                _this.$message.error('未知错误,请联系管理员');
-                            }
-                        })
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
+            // submitForm(formName) {
+            //     this.$refs[formName].validate((valid) => {
+            //         if (valid) {
+            //             const _this = this;
+            //             axios({
+            //                 method: "post",
+            //                 url: "http://localhost:8080/qg-engineering-management-system/user/login",
+            //                 data: _this.user,
+            //             }).then(function (resp) {
+            //
+            //                 console.log(resp.data);
+            //                 console.log(resp.data.code);
+            //
+            //                 if (resp.data.code === 200) {
+            //                     _this.$message({
+            //                         message: '登录成功~',
+            //                         type: 'success'
+            //                     });
+            //                     //通过用户的职位进行页面的跳转
+            //                     location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
+            //                 } else if (resp.data.code === 500200) {
+            //                     _this.$message.error(resp.data.msg);
+            //                 } else {
+            //                     _this.$message.error('未知错误,请联系管理员');
+            //                 }
+            //             })
+            //         } else {
+            //             console.log('error submit!!');
+            //             return false;
+            //         }
+            //     });
+            // },
 
         },
     });

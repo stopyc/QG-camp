@@ -1,5 +1,6 @@
 package cn.stopyc.web.servlet;
 
+import cn.stopyc.bean.MyTeam;
 import cn.stopyc.bean.SingletonFactory;
 
 import cn.stopyc.constant.Result;
@@ -68,13 +69,9 @@ public class UserServlet extends BaseServlet{
 
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
-        try {
-            HttpSession session = req.getSession();
-            session.setAttribute("username",user.getUserName());
-            JsonUtil.toJson(userResult,resp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        HttpSession session = req.getSession();
+        session.setAttribute("username",user.getUserName());
+        JsonUtil.toJson(userResult,resp);
     }
 
 
@@ -92,11 +89,7 @@ public class UserServlet extends BaseServlet{
         Result<User> registerResult = userService.register(StringUtil.getTrimStr(user.getUserName()), Md5Utils.getMD5(user.getPassword()),user.getEmail(),user.getPosition());
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断注册情况
-        try {
-            JsonUtil.toJson(registerResult,resp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        JsonUtil.toJson(registerResult,resp);
     }
 
     public void checkCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -149,14 +142,33 @@ public class UserServlet extends BaseServlet{
         //3.获取处理结果集
         Result<User> userResult = userService.select(StringUtil.getTrimStr(user.getUserName()));
 
-        try {
-            JsonUtil.toJson(userResult,resp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        JsonUtil.toJson(userResult,resp);
     }
 
+    /**
+     * @Description: 查找我的队伍信息
+     * @Param: [req, resp]
+     * @return: void
+     * @Author: stop.yc
+     * @Date: 2022/4/19
+     */
+    public void selectMyTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        //1.登录后别的地方需要获取登录用户.
+        HttpSession session = req.getSession();
+        String  username = (String) session.getAttribute("username");
+
+        //2.获取userService对象
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+
+        //3.获取当前用户的id
+        Integer bossId = userService.getIdByName(username);
+
+
+        Result<MyTeam> myTeamResult = userService.selectMyTeam(bossId);
+
+        JsonUtil.toJson(myTeamResult,resp);
+    }
 }
 
 

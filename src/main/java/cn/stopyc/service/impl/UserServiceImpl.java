@@ -1,16 +1,21 @@
 package cn.stopyc.service.impl;
 
+import cn.stopyc.bean.MyTeam;
 import cn.stopyc.bean.SingletonFactory;
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
 import cn.stopyc.dao.UserDao;
 import cn.stopyc.dao.impl.UserDaoImpl;
+import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
+import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
 import cn.stopyc.util.StringUtil;
 import cn.stopyc.util.TimeUtils;
 
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: qg-engineering-management-system
@@ -102,4 +107,27 @@ public class UserServiceImpl implements UserService {
         return user.getUserId();
     }
 
+    @Override
+    public Result<MyTeam> selectMyTeam(Integer bossId) {
+        //1.调用dao,获取下一级的用户
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+        List<User> users = userDao.selectUsersByBossId(bossId);
+        if (users.size() == 0) {
+            return new Result<>(ResultEnum.NO_TEAM.getCode(),ResultEnum.NO_TEAM.getMsg());
+        }
+        System.out.println("users.size"+users.size());
+
+        //2.平移,获取taskService对象
+        TaskService taskService = SingletonFactory.getTaskServiceSingleton();
+
+        //3.获取任务,那么现在要封装成对象.
+        List<Task> tasks = taskService.getTasksByUsers(users);
+        System.out.println("tasks.size"+tasks.size());
+
+        List<MyTeam> myTeams = new ArrayList<>();
+        for (int i = 0;i < users.size();i++) {
+            myTeams.add(new MyTeam(users.get(i).getUserName(),tasks.get(i).getTaskName(),tasks.get(i).getLevel(),tasks.get(i).getDeadline(),tasks.get(i).getStatus(),tasks.get(i).getUserId(),tasks.get(i).getTaskId()));
+        }
+        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),myTeams);
+    }
 }

@@ -1,6 +1,7 @@
 package cn.stopyc.dao;
 
 import cn.stopyc.po.Task;
+import cn.stopyc.po.User;
 
 import java.util.List;
 
@@ -75,4 +76,12 @@ public interface TaskDao {
      * @param userId
      */
     void setGeneralId(int generalId,int userId) ;
+
+    /**
+     * 通过用户集合获取任务集合
+     * @param users
+     * @return
+     */
+    List<Task> selectTasksByUsers(List<User> users);
+
 }

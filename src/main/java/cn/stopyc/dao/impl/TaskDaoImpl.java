@@ -2,6 +2,7 @@ package cn.stopyc.dao.impl;
 
 import cn.stopyc.dao.TaskDao;
 import cn.stopyc.po.Task;
+import cn.stopyc.po.User;
 import cn.stopyc.service.impl.BeanHandler;
 import cn.stopyc.service.impl.BeanListHandle;
 import cn.stopyc.util.CRUDUtils;
@@ -70,7 +71,18 @@ public class TaskDaoImpl implements TaskDao {
         CRUDUtils.update(updateSql,generalId,userId);
     }
 
-
+    @Override
+    public List<Task> selectTasksByUsers(List<User> users) {
+        //1.拼接字符串
+        StringBuilder sb = new StringBuilder("select * from `t_task` where `userId` in (");
+        for (User u : users) {
+            sb.append(u.getUserId()).append(",");
+        }
+        sb.deleteCharAt(sb.lastIndexOf(","));
+        sb.append(")");
+        String sql = sb.toString();
+        return CRUDUtils.query(sql,new BeanListHandle<>(Task.class));
+    }
 
 
 }

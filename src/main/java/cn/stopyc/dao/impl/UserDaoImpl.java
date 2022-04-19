@@ -3,7 +3,10 @@ package cn.stopyc.dao.impl;
 import cn.stopyc.dao.UserDao;
 import cn.stopyc.po.User;
 import cn.stopyc.service.impl.BeanHandler;
+import cn.stopyc.service.impl.BeanListHandle;
 import cn.stopyc.util.CRUDUtils;
+
+import java.util.List;
 
 /**
  * @program: qg-engineering-management-system
@@ -59,6 +62,12 @@ public class UserDaoImpl implements UserDao {
     public void addTaskId(int taskId, int userId) {
         String sql = "update `t_user` set `taskId`=? where `userId`=?";
         CRUDUtils.update(sql,taskId,userId);
+    }
+
+    @Override
+    public List<User> selectUsersByBossId(Integer bossId) {
+        String sql = "select * from `t_user` where `bossId`=?";
+        return CRUDUtils.query(sql, new BeanListHandle<>(User.class), bossId);
     }
 
 

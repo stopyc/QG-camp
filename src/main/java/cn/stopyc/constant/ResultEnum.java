@@ -18,6 +18,8 @@ public enum ResultEnum {
     NO_TASK(600200,"当前没有任务"),
     INCOMPLETE_TASK(600210,"任务未完成"),
     HAS_TASK(600220,"当前已有任务"),
+    //队伍模块 7002XX
+    NO_TEAM(700200,"队伍中无成员"),
 
 
     ;

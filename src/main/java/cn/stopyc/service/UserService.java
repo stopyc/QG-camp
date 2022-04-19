@@ -1,5 +1,6 @@
 package cn.stopyc.service;
 
+import cn.stopyc.bean.MyTeam;
 import cn.stopyc.constant.Result;
 import cn.stopyc.po.User;
 
@@ -56,4 +57,11 @@ public interface UserService {
      */
     Integer getIdByName(String userName);
 
+
+    /**
+     * 根据上级id查找队伍信息
+     * @param bossId:上级id
+     * @return
+     */
+    Result<MyTeam> selectMyTeam(Integer bossId);
 }
