@@ -61,8 +61,8 @@ public class TaskDaoImpl implements TaskDao {
 
     @Override
     public void addTask(Task task, int userId) {
-        String sql = "insert into `t_task` (`taskName`,`userId`,`level`,`deadline`,`parentTaskId`,`status`) values (?,?,?,?,'0','0')";
-        CRUDUtils.update(sql,task.getTaskName(),userId,task.getLevel(),TimeUtils.getStrFromDate(task.getDeadline()));
+        String sql = "insert into `t_task` (`taskName`,`userId`,`level`,`deadline`,`parentTaskId`,`status`,`generalId`) values (?,?,?,?,?,'0',?)";
+        CRUDUtils.update(sql,task.getTaskName(),userId,task.getLevel(),TimeUtils.getStrFromDate(task.getDeadline()),task.getParentTaskId(),task.getGeneralId());
     }
 
     @Override

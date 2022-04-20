@@ -118,15 +118,25 @@ public class TaskServlet extends BaseServlet {
         //你要添加的任务对象
         Task task = JSON.parseObject(addTask, Task.class);
 
-        //2.获取是谁在添加任务
-        HttpSession session = req.getSession();
-        String  username = (String) session.getAttribute("username");
+        //2.获取添加任务给谁,总负责人给自己
+        Integer userId = task.getUserId();
+        System.out.println(userId);
+        String username;
+        Integer idByName;
+        if (userId == 0) {
+            //是总负责人给自己
+            HttpSession session = req.getSession();
+            username = (String) session.getAttribute("username");
 
-        //3.获取userService对象
-        UserService userService = SingletonFactory.getUserServiceSingleton();
+            //3.获取userService对象
+            UserService userService = SingletonFactory.getUserServiceSingleton();
 
-        //4.获取当前用户的id
-        Integer idByName = userService.getIdByName(username);
+            //4.获取当前用户的id
+            idByName = userService.getIdByName(username);
+        }else {
+            idByName = userId;
+        }
+
 
         //5.获取taskService对象
         TaskService taskService = SingletonFactory.getTaskServiceSingleton();
@@ -137,4 +147,6 @@ public class TaskServlet extends BaseServlet {
         //7.返回结果集
         JsonUtil.toJson(taskResult,resp);
     }
+
+
 }

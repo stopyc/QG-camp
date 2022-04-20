@@ -115,18 +115,25 @@ public class UserServiceImpl implements UserService {
         if (users.size() == 0) {
             return new Result<>(ResultEnum.NO_TEAM.getCode(),ResultEnum.NO_TEAM.getMsg());
         }
-        System.out.println("users.size"+users.size());
 
         //2.平移,获取taskService对象
         TaskService taskService = SingletonFactory.getTaskServiceSingleton();
 
         //3.获取任务,那么现在要封装成对象.
         List<Task> tasks = taskService.getTasksByUsers(users);
-        System.out.println("tasks.size"+tasks.size());
 
         List<MyTeam> myTeams = new ArrayList<>();
-        for (int i = 0;i < users.size();i++) {
-            myTeams.add(new MyTeam(users.get(i).getUserName(),tasks.get(i).getTaskName(),tasks.get(i).getLevel(),tasks.get(i).getDeadline(),tasks.get(i).getStatus(),tasks.get(i).getUserId(),tasks.get(i).getTaskId()));
+        for (User user : users) {
+            if (null == user.getTaskId() || 0 == user.getTaskId()) {
+                myTeams.add(new MyTeam(user.getUserName(), "无任务", -1, null, -1, user.getUserId(), null));
+                continue;
+            }
+            for (Task task : tasks) {
+                if (user.getTaskId().equals(task.getTaskId())) {
+                    myTeams.add(new MyTeam(user.getUserName(), task.getTaskName(), task.getLevel(), task.getDeadline(), task.getStatus(), task.getUserId(), task.getTaskId()));
+                    break;
+                }
+            }
         }
         return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),myTeams);
     }

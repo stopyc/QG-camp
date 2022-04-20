@@ -77,7 +77,7 @@
                             prop="level"
                             label="难度"
                             align="center"
-                            :formatter="levelFormatter"
+                            :formatter="levelFormatter1"
                     >
                     </el-table-column>
 
@@ -100,8 +100,7 @@
                             prop="status"
                             align="center"
                             label="当前状态"
-                            :formatter="statusFormatter"
-
+                            :formatter="statusFormatter1"
                     >
                     </el-table-column>
 
@@ -126,10 +125,13 @@
                 <el-form-item label="任务名称" prop="taskName">
                     <el-input v-model="addTask.taskName" autocomplete="off"></el-input>
                 </el-form-item>
-                <template>
-                    <el-radio v-model="addTask.level" label="0">简单</el-radio>
-                    <el-radio v-model="addTask.level" label="1">困难</el-radio>
-                </template>
+
+                <el-form-item label="任务难度" prop="level">
+                    <template>
+                        <el-radio v-model="addTask.level" label="0">简单</el-radio>
+                        <el-radio v-model="addTask.level" label="1">困难</el-radio>
+                    </template>
+                </el-form-item>
                 <el-form-item label="截止时间" prop="deadline">
                     <el-col :span="11">
                         <el-date-picker type="date" placeholder="选择日期" v-model="addTask.deadline"
@@ -144,170 +146,113 @@
             </el-form>
         </el-dialog>
 
-        <!--        我的队伍-表头-->
-        <el-form :inline="true" :model="teamTableData" class="teamTableData">
+        <!--我的队伍-->
+        <template>
+            <el-table
+                    :data="teamTableData"
+                    style="width: 100%">
 
-            <!--        我的队伍-内容-->
-            <template>
-                <el-table
-                        :data="teamTableData"
-                        style="width: 100%"
-                        :row-class-name="tableRowClassName"
-                        @selection-change="handleSelectionChange"
-                        highlight-current-row
-                        @current-change="handleCurrentChange"
+                <el-table-column
+                        type="index"
+                        width="50">
+                </el-table-column>
+
+                <el-table-column
+                        label="人员"
+                        width="180">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        label="任务"
+                        width="200">
+                    <template slot-scope="scope">
+
+                        <div slot="reference" class="taskName">
+                            <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        label="难度"
+                        width="180"
+                        :formatter="levelFormatter"
                 >
-                    <el-table-column
-                            type="selection"
-                            width="55">
-                    </el-table-column>
-                    <el-table-column
-                            type="index"
-                            width="50">
-                    </el-table-column>
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
+                    </template>
+                </el-table-column>
 
-                    <el-table-column
-                            prop="teamMemberName"
-                            label="人员"
-                            align="center"
-                            width="60"
-                    >
-                    </el-table-column>
+                <el-table-column
+                        label="截止日期"
+                        width="200">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
+                    </template>
+                </el-table-column>
 
-                    <el-table-column
-                            prop="taskName"
-                            label="任务"
-                            align="center"
-                    >
-                    </el-table-column>
+                <el-table-column
+                        label="当前状态"
+                        width="180"
+                        :formatter="statusFormatter"
+                >
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
+                    </template>
+                </el-table-column>
 
-                    <el-table-column
-                            prop="level"
-                            label="难度"
-                            align="center"
-                            width="50"
-                            :formatter="levelFormatter"
-                    >
-                    </el-table-column>
 
-                    <el-table-column
-                            prop="deadline"
-                            label="截止日期"
-                            align="center"
-                    >
-                    </el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleAdd(scope.$index, scope.row)">添加任务
+                        </el-button>
 
-                    <el-table-column
-                            prop="status"
-                            label="当前状态"
-                            align="center"
-                            width="60"
-                            :formatter="statusFormatter"
-                    >
-                    </el-table-column>
+                        <el-button
+                                size="mini"
+                                @click="handleQuery(scope.$index, scope.row)">查看
+                        </el-button>
 
-                    <el-table-column
-                            align="center"
-                            label="操作">
+                        <el-button
+                                size="mini"
+                                type="danger"
+                                @click="MyHandleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
 
-                        <el-row>
-                            <el-button type="primary">添加任务</el-button>
-                            <el-button type="success">查看</el-button>
-                            <el-button type="danger">删除</el-button>
-                        </el-row>
+        <!--        对我的成员添加任务的对话框-->
+        <el-dialog title="添加任务" :visible.sync="teamAddFormVisible">
+            <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
+                <el-form-item label="任务名称" prop="taskName">
+                    <el-input v-model="addTask.taskName" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="任务难度" prop="level">
+                    <template>
+                        <el-radio v-model="addTask.level" label="0">简单</el-radio>
+                        <el-radio v-model="addTask.level" label="1">困难</el-radio>
+                    </template>
+                </el-form-item>
+                <el-form-item label="截止时间" prop="deadline">
+                    <el-col :span="11">
+                        <el-date-picker type="date" placeholder="选择日期" v-model="addTask.deadline"
+                                        style="width: 100%;" autocomplete="off"></el-date-picker>
+                    </el-col>
+                    <el-col class="line" :span="2">-</el-col>
 
-                    </el-table-column>
+                </el-form-item>
+                <el-button id="teamAddButton" type="primary" @click="teamAddTask('addTask')">添加</el-button>
+                <el-button @click="teamAddFormVisible = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
 
-                </el-table>
-            </template>
-        </el-form>
-
-<!--        &lt;!&ndash;查询列表-表头&ndash;&gt;-->
-<!--        <el-form :inline="true" :model="team" class="demo-form-inline">-->
-
-<!--            <el-form-item label="当前状态">-->
-<!--                <el-select v-model="team.status" placeholder="当前状态">-->
-<!--                    <el-option label="启用" value="1"></el-option>-->
-<!--                    <el-option label="禁用" value="0"></el-option>-->
-<!--                </el-select>-->
-<!--            </el-form-item>-->
-
-<!--            <el-form-item label="企业名称">-->
-<!--                <el-input v-model="team.taskName" placeholder="企业名称"></el-input>-->
-<!--            </el-form-item>-->
-
-<!--            <el-form-item label="品牌名称">-->
-<!--                <el-input v-model="team.taskName" placeholder="品牌名称"></el-input>-->
-<!--            </el-form-item>-->
-
-<!--            <el-form-item>-->
-<!--                <el-button type="primary" @click="submitForm(team)">查询</el-button>-->
-<!--            </el-form-item>-->
-<!--        </el-form>-->
-        <!--查询列表-内容-->
-        <!--        <template>-->
-        <!--            <el-table-->
-        <!--                    :data="tableData"-->
-        <!--                    style="width: 100%"-->
-        <!--                    :row-class-name="tableRowClassName"-->
-        <!--                    @selection-change="handleSelectionChange"-->
-        <!--            >-->
-        <!--                <el-table-column-->
-        <!--                        type="selection"-->
-        <!--                        width="55">-->
-        <!--                </el-table-column>-->
-        <!--                <el-table-column-->
-        <!--                        type="index"-->
-        <!--                        width="50">-->
-        <!--                </el-table-column>-->
-
-        <!--                <el-table-column-->
-        <!--                        prop="brandName"-->
-        <!--                        label="品牌名称"-->
-        <!--                        align="center"-->
-        <!--                >-->
-        <!--                </el-table-column>-->
-        <!--                <el-table-column-->
-        <!--                        prop="companyName"-->
-        <!--                        label="企业名称"-->
-        <!--                        align="center"-->
-        <!--                >-->
-        <!--                </el-table-column>-->
-        <!--                <el-table-column-->
-        <!--                        prop="ordered"-->
-        <!--                        align="center"-->
-        <!--                        label="排序">-->
-        <!--                </el-table-column>-->
-        <!--                <el-table-column-->
-        <!--                        prop="status"-->
-        <!--                        align="center"-->
-        <!--                        label="当前状态">-->
-        <!--                </el-table-column>-->
-
-        <!--                <el-table-column-->
-        <!--                        align="center"-->
-        <!--                        label="操作">-->
-
-        <!--                    <el-row>-->
-        <!--                        <el-button type="primary">修改</el-button>-->
-        <!--                        <el-button type="danger">删除</el-button>-->
-        <!--                    </el-row>-->
-
-        <!--                </el-table-column>-->
-
-        <!--            </el-table>-->
-        <!--        </template>-->
-
-        <!--分页工具条-->
-        <!--        <el-pagination-->
-        <!--                @size-change="handleSizeChange"-->
-        <!--                @current-change="handleCurrentChange"-->
-        <!--                :current-page="currentPage"-->
-        <!--                :page-sizes="[5, 10, 15, 20]"-->
-        <!--                :page-size="5"-->
-        <!--                layout="total, sizes, prev, pager, next, jumper"-->
-        <!--                :total="400">-->
-        <!--        </el-pagination>-->
 
     </el-container>
 
@@ -323,8 +268,10 @@
 
 <script>
 
+
     new Vue({
         el: "#chiefPeople",
+
 
         mounted() {
             //页面渲染结束后,发送异步请求,获取数据
@@ -333,6 +280,43 @@
 
         },
         data() {
+
+            //截止日期校验(不能晚于父级任务的时间,不能早于现在,总负责人就只有一个不能早于现在)
+            const validateDeadline = (rule, value, callback) => {
+                const _this = this;
+                const deadlineOfParentTask = _this.myTaskTableData[0].deadline;
+
+
+                let timeNow = Date.now();
+                let timeInput = new Date(value).getTime();
+
+                //对于总负责人的任务
+                if (deadlineOfParentTask === '') {
+                    //只需要判断不早于现在就行了
+                    if (timeNow >= timeInput) {
+                        _this.$message.error("时间已经过了");
+                        return;
+                    } else {
+                        callback();
+                    }
+                }
+
+                //其他的还需要判断是否太晚了
+                let timeParent = new Date(deadlineOfParentTask).getTime();
+
+                if (deadlineOfParentTask === '' || deadlineOfParentTask === 0) {
+                    callback();
+                }
+                if (timeInput >= timeParent) {
+                    _this.$message.error("截止日期设置太晚了");
+                } else if (timeNow >= timeInput) {
+                    _this.$message.error("时间已经过了");
+                } else {
+                    callback();
+                }
+            };
+
+
             const item = {
                 date: '2016-05-02',
                 name: '王小虎',
@@ -341,6 +325,7 @@
             return {
                 //添加表单
                 dialogFormVisible: false,
+                teamAddFormVisible: false,
 
                 // 当前页码
                 currentPage: 4,
@@ -356,16 +341,21 @@
                 rules: {
                     taskName: [
                         {required: true, message: '请输入任务名称', trigger: 'blur'},
+                        {min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur'},
                     ],
                     deadline: [
                         {required: true, message: '请输入截止日期', trigger: 'blur'},
+                        {validator: validateDeadline, trigger: 'blur'}
                     ],
+                    level:[
+                        {required: true, message: '请选择任务难度', trigger: 'blur'},
+                    ]
                 },
 
 
                 addTask: {
                     taskName: '',
-                    level: '0',
+                    level: '',
                     deadline: '',
                     status: '',
                     taskId: '',
@@ -378,7 +368,7 @@
                     taskName: '',
                     level: '',
                     deadline: '',
-                    status: '',
+                    status: '0',
                     taskId: '',
                     userId: '',
                     parentTaskId: '',
@@ -408,6 +398,56 @@
 
         methods: {
 
+            //提交队伍人员任务表单
+            teamAddTask(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const _this = this;
+                        _this.addTask.parentTaskId = _this.myTaskTableData[0].taskId;
+                        _this.addTask.generalId = _this.myTaskTableData[0].taskId;
+                        _this.addTask.status = 0;
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/task/add",
+                            data: _this.addTask,
+                        }).then(function (resp) {
+                            if (resp.data.code === 200) {
+                                document.getElementById("teamAddButton").disabled = true;
+                                _this.teamAddFormVisible = false;
+                                _this.$message.success("任务添加成功");
+                                setTimeout(_this.refresh, 500);
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+
+            //对我的队伍的人添加任务
+            handleAdd(index, row) {
+                console.log(row);
+                const _this = this;
+                if (_this.myTaskTableData[0].taskId === '' || _this.myTaskTableData[0].taskId === 0) {
+                    _this.$message.error("目前您还没有任务可以发布");
+                } else if (row.taskId === "" || row.taskId === 0) {
+                    this.$refs.singleTable.setCurrentRow(row);
+                    console.log("userid" + row.userId);
+                    _this.addTask.userId = row.userId;
+                    _this.teamAddFormVisible = true;
+                } else {
+                    _this.$message.error("您已经有任务了");
+                }
+            },
+
+            handleQuery(index, row) {
+                console.log(index, row);
+            },
+
+            MyHandleDelete(index, row) {
+                console.log(index, row);
+            },
+
             //获取我的队伍的信息
             selectMyTeam() {
                 //session存了当前登录者的姓名
@@ -425,7 +465,6 @@
                         }
                     }
                 })
-
             },
 
             //添加表单
@@ -433,7 +472,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         const _this = this;
-
+                        _this.addTask.userId = 0;
                         _this.addTask.parentTaskId = 0;
                         _this.addTask.status = 0;
                         axios({
@@ -447,7 +486,6 @@
                                 _this.dialogFormVisible = false;
                                 _this.$message.success("任务添加成功");
                                 setTimeout(_this.refresh, 500);
-
                             }
                         })
                     } else {
@@ -512,22 +550,49 @@
             },
 
             //任务完成状态格式化
-            statusFormatter(row, column) {
+            statusFormatter(row) {
+                const status = row
+                if (status === 0) {
+                    return '未完成'
+                } else if (status === 1) {
+                    return '已完成'
+                } else if (status === -1) {
+                    return '无任务'
+                }
+            },
+
+            //任务完成状态格式化(因为表单没有统一格式,只能这样搞了)
+            statusFormatter1(row) {
                 const status = row.status
                 if (status === 0) {
                     return '未完成'
                 } else if (status === 1) {
                     return '已完成'
+                } else if (status === -1) {
+                    return '无任务'
                 }
             },
 
             //任务难度格式化
-            levelFormatter(row, column) {
+            levelFormatter(row) {
+                const level = row
+                if (level === 0) {
+                    return '简单'
+                } else if (level === 1) {
+                    return '困难'
+                } else if (level === -1) {
+                    return '无任务'
+                }
+            },
+            //任务难度格式化
+            levelFormatter1(row) {
                 const level = row.level
                 if (level === 0) {
                     return '简单'
                 } else if (level === 1) {
                     return '困难'
+                } else if (level === -1) {
+                    return '无任务'
                 }
             },
 
@@ -575,6 +640,9 @@
 
             //时间戳转换为日期
             getMyDate(str) {
+                if (str === null) {
+                    return '无任务';
+                }
                 var oDate = new Date(str),
                     oYear = oDate.getFullYear(),
                     oMonth = oDate.getMonth() + 1,
@@ -594,40 +662,6 @@
                 }
                 return num;
             },
-
-            // submitForm(formName) {
-            //     this.$refs[formName].validate((valid) => {
-            //         if (valid) {
-            //             const _this = this;
-            //             axios({
-            //                 method: "post",
-            //                 url: "http://localhost:8080/qg-engineering-management-system/user/login",
-            //                 data: _this.user,
-            //             }).then(function (resp) {
-            //
-            //                 console.log(resp.data);
-            //                 console.log(resp.data.code);
-            //
-            //                 if (resp.data.code === 200) {
-            //                     _this.$message({
-            //                         message: '登录成功~',
-            //                         type: 'success'
-            //                     });
-            //                     //通过用户的职位进行页面的跳转
-            //                     location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
-            //                 } else if (resp.data.code === 500200) {
-            //                     _this.$message.error(resp.data.msg);
-            //                 } else {
-            //                     _this.$message.error('未知错误,请联系管理员');
-            //                 }
-            //             })
-            //         } else {
-            //             console.log('error submit!!');
-            //             return false;
-            //         }
-            //     });
-            // },
-
         },
     });
 </script>

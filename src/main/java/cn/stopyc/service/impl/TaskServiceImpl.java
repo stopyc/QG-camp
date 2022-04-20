@@ -153,8 +153,11 @@ public class TaskServiceImpl implements TaskService {
         //4.获取新增的任务id(自增)
         Task taskByUserId = taskDao.getTaskByUserId(userId);
 
-        //5.设置总任务id
-        taskDao.setGeneralId(taskByUserId.getTaskId(),userId);
+        //如果是总负责人的话,需要设置总任务id
+        if (task.getGeneralId() == null || task.getGeneralId() == 0) {
+            //5.设置总任务id
+            taskDao.setGeneralId(taskByUserId.getTaskId(),userId);
+        }
 
         //6.为用户添加任务
         userDao.addTaskId(taskByUserId.getTaskId(),userId);
