@@ -74,4 +74,41 @@ public interface UserDao {
      * @return
      */
     List<User> selectUsersByBossId(Integer bossId);
+
+    /**
+     * 踢人
+     * @param userId:用户id
+     */
+    void kickMember(Integer userId);
+
+
+    /**
+     * 获取下级用户
+     * @param userId:上级id
+     * @return
+     */
+    List<User> getSonUser(Integer userId);
+
+    /**
+     * 删除任务id
+     * @param id:用户id
+     */
+    void removeTask(Integer id);
+
+
+    /**
+     * 根据条件进行查询
+     * @param sql
+     * @param conditions
+     * @return
+     */
+    List<User> selectByConditions(String sql, Object[] conditions);
+
+
+    /**
+     * 通过用户集合返回上级集合
+     * @param users:用户集合
+     * @return
+     */
+    List<User> selectBossesByUsers(List<User> users);
 }

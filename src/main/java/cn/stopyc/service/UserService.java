@@ -1,8 +1,11 @@
 package cn.stopyc.service;
 
 import cn.stopyc.bean.MyTeam;
+import cn.stopyc.bean.QueryUser;
 import cn.stopyc.constant.Result;
 import cn.stopyc.po.User;
+
+import java.util.List;
 
 /**
 * @Description: 用户service层
@@ -64,4 +67,19 @@ public interface UserService {
      * @return
      */
     Result<MyTeam> selectMyTeam(Integer bossId);
+
+
+    /**
+     * 上级踢人业务
+     * @param userId:被踢的用户id
+     */
+    void kickMember(Integer userId);
+
+
+    /**
+     * 查询下级用户
+     * @param queryUser:封装查询对象
+     * @return
+     */
+    Result<QueryUser> queryUser(User queryUser, Integer sort);
 }

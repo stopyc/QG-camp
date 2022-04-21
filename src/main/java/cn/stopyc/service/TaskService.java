@@ -55,4 +55,10 @@ public interface TaskService {
      * @return
      */
     List<Task> getTasksByUsers(List<User> users);
+
+    /**
+     * 删除任务
+     * @param taskId:任务id
+     */
+    void deleteTask(Integer taskId);
 }

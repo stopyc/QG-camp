@@ -11,6 +11,7 @@ import cn.stopyc.service.TaskService;
 import cn.stopyc.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -169,6 +170,37 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> getTasksByUsers(List<User> users) {
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
         return taskDao.selectTasksByUsers(users);
+    }
+
+    @Override
+    public void deleteTask(Integer taskId) {
+        //删除任务,直接删除id对应的就行了,同时还要删除下级任务.
+
+        //需要删除的任务id集合
+        List<Integer> needDeleteTaskIds = new ArrayList<>();
+        needDeleteTaskIds.add(taskId);
+        //1.调用dao
+        TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
+
+        Iterator<Integer> iterator = needDeleteTaskIds.iterator();
+        while(iterator.hasNext()) {
+            Integer id = iterator.next();
+            //2.删除当前任务
+            taskDao.deleteTask(id);
+
+            //3.需要删除的集合中需要少一个id
+            iterator.remove();
+
+            //4.获取下级任务
+            List<Task> sonTasks = taskDao.getSonTasks(id + "");
+
+            //5.添加需要删除的任务id
+            for (Task sonTask : sonTasks) {
+                needDeleteTaskIds.add(sonTask.getTaskId());
+            }
+            //6.更新迭代器
+            iterator = needDeleteTaskIds.iterator();
+        }
     }
 
 

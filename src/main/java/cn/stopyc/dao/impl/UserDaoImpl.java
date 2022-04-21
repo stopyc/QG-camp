@@ -1,6 +1,7 @@
 package cn.stopyc.dao.impl;
 
 import cn.stopyc.dao.UserDao;
+import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.impl.BeanHandler;
 import cn.stopyc.service.impl.BeanListHandle;
@@ -68,6 +69,42 @@ public class UserDaoImpl implements UserDao {
     public List<User> selectUsersByBossId(Integer bossId) {
         String sql = "select * from `t_user` where `bossId`=?";
         return CRUDUtils.query(sql, new BeanListHandle<>(User.class), bossId);
+    }
+
+    @Override
+    public void kickMember(Integer userId) {
+        String sql = "update `t_user` set `bossId`=0 where `userId`=?";
+        CRUDUtils.update(sql,userId);
+    }
+
+    @Override
+    public List<User> getSonUser(Integer bossId) {
+        String sql = "select * from `t_user` where `bossId`=?";
+        return CRUDUtils.query(sql,new BeanListHandle<>(User.class),bossId);
+    }
+
+    @Override
+    public void removeTask(Integer id) {
+        String sql = "update `t_user` set `taskId`=0 where `userId`=?";
+        CRUDUtils.update(sql,id);
+    }
+
+    @Override
+    public List<User> selectByConditions(String sql, Object[] conditions) {
+        return CRUDUtils.query(sql, new BeanListHandle<>(User.class), conditions);
+    }
+
+    @Override
+    public List<User> selectBossesByUsers(List<User> users) {
+        //1.拼接字符串
+        StringBuilder sb = new StringBuilder("select * from `t_user` where `userId` in (");
+        for (User u : users) {
+            sb.append(u.getBossId()).append(",");
+        }
+        sb.deleteCharAt(sb.lastIndexOf(","));
+        sb.append(")");
+        String sql = sb.toString();
+        return CRUDUtils.query(sql,new BeanListHandle<>(User.class));
     }
 
 

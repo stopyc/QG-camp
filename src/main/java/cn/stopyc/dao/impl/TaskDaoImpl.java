@@ -49,8 +49,8 @@ public class TaskDaoImpl implements TaskDao {
 
     @Override
     public void deleteTask(Integer taskId) {
-        String sql = "delete from `t_task` where `generalId`=?";
-        CRUDUtils.update(sql,taskId);
+        String sql = "delete from `t_task` where `generalId`=? or `taskId`=?";
+        CRUDUtils.update(sql,taskId,taskId);
     }
 
     @Override

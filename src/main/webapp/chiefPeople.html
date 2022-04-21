@@ -152,13 +152,13 @@
                     :data="teamTableData"
                     style="width: 100%">
 
-                <el-table-column
-                        type="index"
-                        width="50">
-                </el-table-column>
+<!--                <el-table-column-->
+<!--                        type="index"-->
+<!--                        width="50">-->
+<!--                </el-table-column>-->
 
                 <el-table-column
-                        label="人员"
+                        label="我的成员"
                         width="180">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
@@ -169,7 +169,6 @@
                         label="任务"
                         width="200">
                     <template slot-scope="scope">
-
                         <div slot="reference" class="taskName">
                             <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
                         </div>
@@ -209,19 +208,24 @@
                     <template slot-scope="scope">
                         <el-button
                                 size="mini"
-                                @click="handleAdd(scope.$index, scope.row)">添加任务
+                                @click="handleAdd(scope.$index, scope.row)"
+                                >添加任务
                         </el-button>
 
                         <el-button
                                 size="mini"
-                                @click="handleQuery(scope.$index, scope.row)">查看
+                                @click="handleQuery(scope.$index, scope.row)"
+                               >查看
                         </el-button>
+
 
                         <el-button
                                 size="mini"
                                 type="danger"
-                                @click="MyHandleDelete(scope.$index, scope.row)">删除
+                                @click="MyHandleDelete(scope.$index, scope.row)"
+                                >踢出
                         </el-button>
+
                     </template>
                 </el-table-column>
             </el-table>
@@ -253,6 +257,119 @@
             </el-form>
         </el-dialog>
 
+        <!--所有经理的信息(查询框)-->
+        <el-form :inline="true" :model="queryUser" class="queryUser">
+
+            <el-form-item label="项目经理姓名" >
+                <el-input v-model="queryUser.userName" placeholder="项目经理姓名" ></el-input>
+            </el-form-item>
+
+            <el-form-item label="性别">
+                <el-select v-model="queryUser.gender" placeholder="性别">
+                    <el-option label="男" value="1"></el-option>
+                    <el-option label="女" value="0"></el-option>
+                    <el-option label="所有" value="-1"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="排序">
+                <el-select v-model="sort" placeholder="排序">
+                    <el-option label="姓名升序" value="1"></el-option>
+                    <el-option label="姓名降序" value="2"></el-option>
+                    <el-option label="入职时间升序" value="3"></el-option>
+                    <el-option label="入职时间降序" value="4"></el-option>
+                    <el-option label="综合排序" value="0"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="排序">
+                <el-select v-model="queryUser.bossId" placeholder="无所属">
+                    <el-option label="有所属" value="1"></el-option>
+                    <el-option label="无所属" value="0"></el-option>
+                    <el-option label="所有" value="-1"></el-option>
+                </el-select>
+            </el-form-item>
+
+            <el-form-item>
+                <el-button type="primary" @click="querySon">查询</el-button>
+            </el-form-item>
+        </el-form>
+
+<!--        所有经理信息展示-->
+        <template>
+            <el-table
+                    :data="allManager"
+                    style="width: 100%">
+
+                <el-table-column
+                        type="index"
+                        width="50">
+                </el-table-column>
+
+                <el-table-column
+                        label="经理"
+                        width="180">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.userName }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        label="性别"
+                        width="200"
+                        :formatter="genderFormatter">
+                    <template slot-scope="scope">
+                        <div slot="reference" class="gender">
+                            <el-tag size="medium">{{ scope.row.gender }}</el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        label="入职时间"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{scope.row.hireDate }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        label="上级姓名"
+                        width="200">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.bossName }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        label="任务"
+                        width="180"
+                >
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{scope.row.taskName}}</span>
+                    </template>
+                </el-table-column>
+
+
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                size="mini"
+                                @click="handleAdd(scope.$index, scope.row)"
+                        >进队
+                        </el-button>
+
+<!--                        <el-button-->
+<!--                                size="mini"-->
+<!--                                @click="handleQuery(scope.$index, scope.row)"-->
+<!--                        >查看-->
+<!--                        </el-button>-->
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
+
 
     </el-container>
 
@@ -269,6 +386,7 @@
 <script>
 
 
+
     new Vue({
         el: "#chiefPeople",
 
@@ -277,9 +395,10 @@
             //页面渲染结束后,发送异步请求,获取数据
             this.selectMyTask();
             this.selectMyTeam();
-
+            this.querySon();
         },
         data() {
+
 
             //截止日期校验(不能晚于父级任务的时间,不能早于现在,总负责人就只有一个不能早于现在)
             const validateDeadline = (rule, value, callback) => {
@@ -323,6 +442,8 @@
                 address: '上海市普陀区金沙江路 1518 弄'
             };
             return {
+
+                sort:'0',
                 //添加表单
                 dialogFormVisible: false,
                 teamAddFormVisible: false,
@@ -349,10 +470,25 @@
                     ],
                     level:[
                         {required: true, message: '请选择任务难度', trigger: 'blur'},
-                    ]
+                    ],
+
                 },
 
 
+                //所有经理的表格
+                allManager:[{
+                    userId:'',
+                    userName:'',
+                    gender:'',
+                    taskId:'',
+                    hireDate:'',
+                    bossId:'',
+                    bossName:'',
+                    taskName:'',
+                }],
+
+
+                //添加任务的表单
                 addTask: {
                     taskName: '',
                     level: '',
@@ -364,11 +500,22 @@
                     generalId: '',
                 },
 
+                //查询封装对象
+                queryUser:{
+                    userId:'',
+                    userName:'',
+                    gender:'-1',
+                    taskId:'',
+                    position:'',
+                    bossId:'-1',
+                },
+
+                //我的任务的表格
                 myTaskTableData: [{
                     taskName: '',
                     level: '',
                     deadline: '',
-                    status: '0',
+                    status: '',
                     taskId: '',
                     userId: '',
                     parentTaskId: '',
@@ -379,7 +526,7 @@
 
                 // 队伍数据
                 teamTableData: [{
-                    teamMemberName: '',
+                    teamMemberName:'',
                     taskName: '',
                     level: '',
                     deadline: '',
@@ -397,6 +544,31 @@
         },
 
         methods: {
+            //查询下级用户
+            querySon() {
+                const _this = this;
+                console.log(_this.queryUser);
+
+                console.log(_this.sort);
+                _this.queryUser.position = 1;
+
+                const answerStr = JSON.stringify(_this.queryUser);
+                const o = JSON.parse(answerStr);
+                const r = JSON.stringify(o);
+                // JSON.stringify(_this.queryUser)
+                // var json = encodeURI(JSON.stringify(_this.queryUser),"utf-8")
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/selectSon",
+                    data:r+"&"+_this.sort,
+                }).then(function (resp) {
+                    if (resp.data.code === 200) {
+                        console.log(JSON.parse(JSON.stringify(resp.data.data)));
+                        _this.allManager = resp.data.data;
+                        // setTimeout(_this.refresh, 500);
+                    }
+                })
+            },
 
             //提交队伍人员任务表单
             teamAddTask(formName) {
@@ -426,8 +598,12 @@
 
             //对我的队伍的人添加任务
             handleAdd(index, row) {
-                console.log(row);
                 const _this = this;
+                if (row.userId === '') {
+                    _this.$message.error("目前队伍没有成员");
+                    return ;
+                }
+                console.log(row);
                 if (_this.myTaskTableData[0].taskId === '' || _this.myTaskTableData[0].taskId === 0) {
                     _this.$message.error("目前您还没有任务可以发布");
                 } else if (row.taskId === "" || row.taskId === 0) {
@@ -436,16 +612,52 @@
                     _this.addTask.userId = row.userId;
                     _this.teamAddFormVisible = true;
                 } else {
-                    _this.$message.error("您已经有任务了");
+                    _this.$message.error("他已经有任务了");
                 }
             },
 
             handleQuery(index, row) {
-                console.log(index, row);
+                const _this = this;
+                if (row.userId === '') {
+                    _this.$message.error("目前队伍没有成员");
+                    return ;
+                }
+
             },
 
             MyHandleDelete(index, row) {
-                console.log(index, row);
+                const _this = this;
+                if (row.userId === '') {
+                    _this.$message.error("目前队伍没有成员");
+                    return ;
+                }
+                this.$confirm('踢出成员同时会删除该任务,是否踢出?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$message({
+                        type: 'success',
+                        message: '踢出成功!',
+                    });
+
+                    console.log(row);
+                    axios({
+                        method: "post",
+                        url: "http://localhost:8080/qg-engineering-management-system/user/kickMember",
+                        data: row.userId+"&"+row.taskId,
+                    }).then(function (resp) {
+                        if (resp.data.code === 200) {
+                            setTimeout(_this.refresh, 500);
+                        }
+                    })
+
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消踢出'
+                    });
+                });
             },
 
             //获取我的队伍的信息
@@ -570,6 +782,14 @@
                     return '已完成'
                 } else if (status === -1) {
                     return '无任务'
+                }
+            },
+            genderFormatter(row) {
+                const gender = row.gender;
+                if (gender === 0) {
+                    return "女";
+                }else {
+                    return "男";
                 }
             },
 

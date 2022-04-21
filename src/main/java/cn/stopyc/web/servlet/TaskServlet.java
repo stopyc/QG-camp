@@ -52,6 +52,7 @@ public class TaskServlet extends BaseServlet {
 
         //6.获取用户下的任务,并封装成对象返回来(可能不存在)
         Result<List<Task>> taskResult = taskService.getTaskByUserId(idByName);
+        System.out.println("111"+taskResult.getData());
 
         //7.返回结果集
         JsonUtil.toJson(taskResult,resp);
@@ -120,6 +121,7 @@ public class TaskServlet extends BaseServlet {
 
         //2.获取添加任务给谁,总负责人给自己
         Integer userId = task.getUserId();
+
         System.out.println(userId);
         String username;
         Integer idByName;

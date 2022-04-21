@@ -31,6 +31,7 @@ public class JsonUtil {
         }
         String json = JSONObject.toJSONString(result, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullNumberAsZero, SerializerFeature.WriteNullListAsEmpty, SerializerFeature.WriteNullStringAsEmpty, SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.DisableCircularReferenceDetect);
 
+        System.out.println("后来"+json);
         writer.write(json);
         writer.close();
     }

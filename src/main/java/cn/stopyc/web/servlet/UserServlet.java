@@ -1,6 +1,7 @@
 package cn.stopyc.web.servlet;
 
 import cn.stopyc.bean.MyTeam;
+import cn.stopyc.bean.QueryUser;
 import cn.stopyc.bean.SingletonFactory;
 
 import cn.stopyc.constant.Result;
@@ -10,6 +11,7 @@ import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
+import cn.stopyc.service.impl.TaskServiceImpl;
 import cn.stopyc.util.CheckCodeUtil;
 import cn.stopyc.util.JsonUtil;
 import cn.stopyc.util.Md5Utils;
@@ -24,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -167,8 +171,78 @@ public class UserServlet extends BaseServlet{
 
         Result<MyTeam> myTeamResult = userService.selectMyTeam(bossId);
 
+        System.out.println("前"+myTeamResult.getData());
         JsonUtil.toJson(myTeamResult,resp);
     }
+
+    /**
+    * @Description: 踢出成员
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/21
+    */
+    public void kickMember(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        //1.获取前端数据
+        BufferedReader reader = req.getReader();
+        String userIdAndTaskId = reader.readLine();
+        String[] split = userIdAndTaskId.split("&");
+        for (String s : split) {
+            System.out.println(s);
+        }
+        //第一个用户id,第二个是任务id
+
+        //2.获取userService对象
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+        TaskService taskService = SingletonFactory.getTaskServiceSingleton();
+
+        userService.kickMember(Integer.parseInt(split[0]));
+        if (!(StringUtil.isEmpty(split[1]) || "0".equals(split[1]))){
+            taskService.deleteTask(Integer.parseInt(split[1]));
+        }
+
+        Result result = new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+
+        JsonUtil.toJson(result,resp);
+    }
+
+
+    /**
+    * @Description: 判断是否存在该下级用户
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/21
+    */
+    public void selectSon(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        //1.获取前端数据(第一个是用户姓名,第二个是职位标志)
+        BufferedReader reader = req.getReader();
+        String queryUserStr = reader.readLine();
+        String[] split = queryUserStr.split("&");
+
+        split[0] = new String(split[0].getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        User queryUser = JSON.parseObject(split[0], User.class);
+
+        //2.获取查询的用户信息
+
+        //3.获取userService对象
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+
+        Result<QueryUser> result = userService.queryUser(queryUser,Integer.parseInt(split[1]));
+
+
+        System.out.println("222"+result.getData());
+        JsonUtil.toJson(result,resp);
+
+//        //response.setContentType("text/json");
+//        resp.setContentType("text/json");
+//        String jsonString = JSON.toJSONString(result);
+//        System.out.println("后来"+jsonString);
+//        resp.getWriter().write(jsonString);
+    }
+
 }
 
 
