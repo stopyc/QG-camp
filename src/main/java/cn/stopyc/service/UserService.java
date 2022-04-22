@@ -22,7 +22,7 @@ public interface UserService {
      * @param password:用户密码
      * @return
      */
-    Result<User> login(String userName, String password);
+    Result<Integer> login(String userName, String password);
 
 
     /**
@@ -82,4 +82,13 @@ public interface UserService {
      * @return
      */
     Result<QueryUser> queryUser(User queryUser, Integer sort);
+
+
+    /**
+     * 进队业务
+     * @param inTeamUserId:要进队的人的id
+     * @param bossName:上级id
+     * @return
+     */
+    Result inTeam(Integer inTeamUserId, String bossName);
 }

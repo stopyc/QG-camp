@@ -69,8 +69,7 @@ public class UserServlet extends BaseServlet{
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
         //4.调用service层的登录功能,获取处理结果集(通过名字和密码进行登录)
-        Result<User> userResult = userService.login(user.getUserName(), user.getPassword());
-
+        Result<Integer> userResult = userService.login(user.getUserName(), user.getPassword());
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
         HttpSession session = req.getSession();
@@ -171,7 +170,6 @@ public class UserServlet extends BaseServlet{
 
         Result<MyTeam> myTeamResult = userService.selectMyTeam(bossId);
 
-        System.out.println("前"+myTeamResult.getData());
         JsonUtil.toJson(myTeamResult,resp);
     }
 
@@ -233,14 +231,35 @@ public class UserServlet extends BaseServlet{
         Result<QueryUser> result = userService.queryUser(queryUser,Integer.parseInt(split[1]));
 
 
-        System.out.println("222"+result.getData());
         JsonUtil.toJson(result,resp);
 
-//        //response.setContentType("text/json");
-//        resp.setContentType("text/json");
-//        String jsonString = JSON.toJSONString(result);
-//        System.out.println("后来"+jsonString);
-//        resp.getWriter().write(jsonString);
+    }
+
+    /**
+    * @Description: 指定成员进队
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/22
+    */
+    public void inTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        //1.获取前端数据(要进队的用户id)
+        BufferedReader reader = req.getReader();
+        String inTeamUserId = reader.readLine();
+
+        //2.获取谁在操作这个用户
+        HttpSession session = req.getSession();
+        String  bossName = (String) session.getAttribute("username");
+
+        //3.获取userService对象
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+
+        //4.获取结果集
+        Result result = userService.inTeam(Integer.parseInt(inTeamUserId),bossName);
+
+        //5.返回前端
+        JsonUtil.toJson(result,resp);
     }
 
 }

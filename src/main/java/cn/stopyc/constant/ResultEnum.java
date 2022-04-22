@@ -20,6 +20,8 @@ public enum ResultEnum {
     HAS_TASK(600220,"当前已有任务"),
     //队伍模块 7002XX
     NO_TEAM(700200,"队伍中无成员"),
+    //查询模块 8002XX
+    NOT_FOUND(800200,"查无该条件用户"),
 
 
     ;

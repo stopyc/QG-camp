@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Result<User> login(String userName, String password) {
+    public Result<Integer> login(String userName, String password) {
 
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
         //1.dao类进行查询登录的用户信息
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             //3.如果对象不为null,那么就表示找到了这个对象,表示成功了
             //4.登录成功,应该返回对象,但是不应该包含用户的敏感信息
             user.setPassword("");
-            return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
+            return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(),user.getPosition());
         }
     }
 
@@ -239,6 +239,10 @@ public class UserServiceImpl implements UserService {
         String sql = sb.toString();
         List<User> users = userDao.selectByConditions(sql,conditions.toArray());
 
+        //找不到用户
+        if(users.size() == 0) {
+            return new Result<>(ResultEnum.NOT_FOUND.getCode(),ResultEnum.NOT_FOUND.getMsg());
+        }
         //现在已经拿到了用户数据,现在需要封装数据返回前端
 
         //9.获取任务集合
@@ -276,6 +280,21 @@ public class UserServiceImpl implements UserService {
             }
         }
         return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),queryUsers);
+    }
+
+    @Override
+    public Result inTeam(Integer inTeamUserId, String bossName) {
+
+        //1.获取dao
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+
+        //2.获取上级用户,目的是得到id
+        User user = userDao.selectByName(bossName);
+
+        //3.调用进队方法
+        userDao.inTeam(inTeamUserId,user.getUserId());
+
+        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }
 }
 

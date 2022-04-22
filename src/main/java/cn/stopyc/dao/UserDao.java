@@ -111,4 +111,12 @@ public interface UserDao {
      * @return
      */
     List<User> selectBossesByUsers(List<User> users);
+
+
+    /**
+     * 进队
+     * @param inTeamUserId:进队用户id
+     * @param userId:上级id
+     */
+    void inTeam(Integer inTeamUserId, Integer userId);
 }

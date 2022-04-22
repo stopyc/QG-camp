@@ -107,5 +107,11 @@ public class UserDaoImpl implements UserDao {
         return CRUDUtils.query(sql,new BeanListHandle<>(User.class));
     }
 
+    @Override
+    public void inTeam(Integer inTeamUserId, Integer userId) {
+        String sql = "update `t_user` set `bossId`=? where `userId`=?";
+        CRUDUtils.update(sql,userId,inTeamUserId);
+    }
+
 
 }
