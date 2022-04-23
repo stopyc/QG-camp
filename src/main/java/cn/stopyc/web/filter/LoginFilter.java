@@ -1,5 +1,7 @@
 package cn.stopyc.web.filter;
 
+import cn.stopyc.constant.SessionConstant;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ public class LoginFilter implements Filter {
         }
 
         HttpSession session = request.getSession();
+        System.out.println("username");
         Object user = session.getAttribute("username");
 
         if (user == null) {

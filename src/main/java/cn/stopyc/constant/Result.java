@@ -11,6 +11,7 @@ public class Result<T> {
     private Integer code;
     //信息
     private String msg;
+
     //数据
     private T data;
     //

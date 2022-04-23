@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>个人信息</title>
+
+    <style>
+        .el-header {
+            background-color: #B3C0D1;
+            color: #333;
+            line-height: 60px;
+        }
+
+        .el-aside {
+            color: #333;
+        }
+
+        #img{
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 800px;
+            right: 0;
+            margin: auto;
+        }
+
+        .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 178px;
+            height: 178px;
+            line-height: 178px;
+            text-align: center;
+        }
+        .avatar {
+            width: 178px;
+            height: 178px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<el-container style="height: 800px; border: 1px solid #eee" id="infoDiv">
+    <!--            三个边栏-->
+    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <el-menu :default-openeds="['1', '3']">
+
+            <el-menu-item index="1"><el-button @click="myTeam" target="_blank">队伍</el-button></el-menu-item>
+
+            <el-menu-item index="2">个人信息</el-menu-item>
+
+            <el-menu-item index="3">消息通知</el-menu-item>
+        </el-menu>
+    </el-aside>
+
+    <!--    内容-->
+    <el-container>
+        <!--        页头-->
+        <el-header style="text-align: right; font-size: 12px">
+            <el-dropdown>
+                <i class="el-icon-setting" style="margin-right: 15px"></i>
+                <el-dropdown-menu slot="dropdown">
+                    <el-button type="text" @click="loginOut">退出登录</el-button>
+                </el-dropdown-menu>
+            </el-dropdown>
+            <el-tag v-model="username">{{username}}</el-tag>
+        </el-header>
+
+        <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="用户名称">
+                <el-input v-model="form.name"  style="width: 300px;"></el-input>
+
+<!--                <el-upload-->
+<!--                        class="avatar-uploader"-->
+<!--                        action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--                        :show-file-list="false"-->
+<!--                        :on-success="handleAvatarSuccess"-->
+<!--                        :before-upload="beforeAvatarUpload">-->
+<!--                    <img v-if="imageUrl" :src="imageUrl" class="avatar">-->
+<!--                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
+<!--                </el-upload>-->
+            </el-form-item>
+            <el-form-item label="密码">
+                <el-input
+                        placeholder="*********"
+                        :disabled="true">
+                </el-input>
+            </el-form-item>
+
+            <el-form-item label="性别">
+                <template>
+                    <el-radio v-model="radio" label="1">男</el-radio>
+                    <el-radio v-model="radio" label="0">女</el-radio>
+                </template>
+            </el-form-item>
+
+            <el-form-item prop="email" label="邮箱:">
+                <el-input v-model="user.email" style="width: 300px;"></el-input>
+            </el-form-item>
+
+
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">立即创建</el-button>
+                <el-button>取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-container>
+</el-container>
+
+<!--导入依赖-->
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+
+<script>
+    //创建vue对象
+    new Vue({
+        el: "#infoDiv",
+        mounted(){
+            const _this = this;
+            axios({
+                method: "post",
+                url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
+            }).then(function (resp) {
+                _this.username = resp.data.msg;
+                _this.position = resp.data.data;
+                _this.selectMyTask();
+                _this.selectMyTeam(resp.data.msg);
+                console.log(resp.data.msg);
+                _this.querySon();
+            })
+        },
+        data() {
+            const validateUserName = (rule, value, callback) => {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp)  {
+                    if (resp.data.code === 500220) {
+                        // _this.$message.error(resp.data.msg);
+                        callback(new Error(resp.data.msg));
+                    } else {
+                        callback();
+                    }
+                })
+            };
+            return {
+
+                //用户
+                user: {
+                    username: '',
+                    password: '',
+                    checkPass: '',
+                    email: '',
+                    position:''
+                },
+
+                //头像地址
+                imageUrl: '',
+
+
+                form: {
+                    name: '',
+                    region: '',
+                    date1: '',
+                    date2: '',
+                    delivery: false,
+                    type: [],
+                    resource: '',
+                    desc: ''
+                },
+
+
+                //登录表单
+                username: '',
+                position: '',
+
+                //表单校验
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                        {validator: validateUserName, trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
+                    ],
+                }
+
+            }
+        },
+
+        methods: {
+
+
+
+            handleAvatarSuccess(res, file) {
+                this.imageUrl = URL.createObjectURL(file.raw);
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
+
+
+            myTeam(){
+                if (this.position === 0) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/chiefPeople.html");
+                }else if (this.position === 1) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/engineering.html");
+                }else if (this.position === 2) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/foreman.html");
+                }else if (this.position === 3) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/worker.html");
+                }
+            },
+
+            onSubmit() {
+                console.log('submit!');
+            },
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const _this = this;
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/user/login",
+                            data: _this.user,
+                        }).then(function (resp) {
+
+
+                            if (resp.data.code === 200) {
+                                _this.position = resp.data.data;
+                                _this.$message({
+                                    message: '登录成功~3秒后跳转',
+                                    type: 'success'
+                                });
+                                //通过用户的职位进行页面的跳转
+                                setTimeout(_this.changeMain,2000);
+
+                            } else if (resp.data.code === 500200) {
+                                _this.$message.error(resp.data.msg);
+                            } else {
+                                _this.$message.error('未知错误,请联系管理员');
+                            }
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+
+            //用户名输入失焦,去看看数据库是否有没有对应的名字
+            myOnblur() {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp)  {
+                    if (resp.data.code === 500220) {
+                        _this.$message.error(resp.data.msg);
+                    }
+                })
+            },
+
+
+        },
+    });
+
+
+</script>
+
+</body>
+</html>

@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
             //3.如果对象不为null,那么就表示找到了这个对象,表示有重复名
             //4.登录成功,应该返回对象,但是不应该包含用户的敏感信息
             //5.注册失焦,重复名
-            return new Result<>(ResultEnum.REPEAT_NAME.getCode(), ResultEnum.REPEAT_NAME.getMsg());
+            return new Result<>(ResultEnum.REPEAT_NAME.getCode(), ResultEnum.REPEAT_NAME.getMsg(),user);
         }
     }
 
@@ -114,9 +114,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<MyTeam> selectMyTeam(Integer bossId) {
-        //1.调用dao,获取下一级的用户
+        //1.获取dao
+        //2.其他人获取下一级的用户,小工获取同级同队伍的成员
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
-        List<User> users = userDao.selectUsersByBossId(bossId);
+
+        //3.获取用户对象
+        User worker = userDao.getUserByUserId(bossId);
+
+        //下级用户集合
+        List<User> users = null;
+        //4.是小工
+        if (worker.getPosition() == 3) {
+            Integer bossIdOfWorker = worker.getBossId();
+            //5.没有上级,那么他就没有队伍
+            if (null == bossIdOfWorker || 0 == bossIdOfWorker) {
+                return new Result<>(ResultEnum.NO_TEAM.getCode(),ResultEnum.NO_TEAM.getMsg());
+            }
+            //6.有上级,那么就要获取他上级手下的成员
+            users = userDao.getSonUser(bossIdOfWorker);
+        } else {
+            users = userDao.selectUsersByBossId(bossId);
+        }
+
         if (users.size() == 0) {
             return new Result<>(ResultEnum.NO_TEAM.getCode(),ResultEnum.NO_TEAM.getMsg());
         }

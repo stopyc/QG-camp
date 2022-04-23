@@ -60,7 +60,7 @@ public class CRUDUtils {
     }
 
     /**
-    * @Description:封装查询语句
+    * @Description: 封装查询语句
     * @Param: [sql, handler, params]
     * @return: T
     * @Author: stop.yc

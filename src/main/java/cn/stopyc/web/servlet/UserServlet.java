@@ -6,6 +6,7 @@ import cn.stopyc.bean.SingletonFactory;
 
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
+import cn.stopyc.constant.SessionConstant;
 import cn.stopyc.dao.TaskDao;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
@@ -40,7 +41,7 @@ import java.util.List;
 @WebServlet("/user/*")
 public class UserServlet extends BaseServlet{
 
-
+//    private static final String sessionUserName = SessionConstant.SESSION_USERNAME;
 
 
     /**
@@ -51,6 +52,7 @@ public class UserServlet extends BaseServlet{
     * @Date: 2022/4/13
     */
     public void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 
 //        System.out.println("我是login");
 
@@ -73,6 +75,10 @@ public class UserServlet extends BaseServlet{
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
         HttpSession session = req.getSession();
+
+        System.out.println("login == " + user.getUserName());
+
+        //6.设置sessionUserName不重复
         session.setAttribute("username",user.getUserName());
         JsonUtil.toJson(userResult,resp);
     }
@@ -86,6 +92,8 @@ public class UserServlet extends BaseServlet{
         //1.获取前端数据(post)请求体
         BufferedReader reader = req.getReader();
         String userStr = reader.readLine();
+
+        System.out.println("userStr = " + userStr);
         User user = JSON.parseObject(userStr, User.class);
 //
         UserService userService = SingletonFactory.getUserServiceSingleton();
@@ -157,6 +165,7 @@ public class UserServlet extends BaseServlet{
      */
     public void selectMyTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+
 //        //1.登录后别的地方需要获取登录用户.
 //        HttpSession session = req.getSession();
 //        String  username = (String) session.getAttribute("username");
@@ -168,13 +177,11 @@ public class UserServlet extends BaseServlet{
 
         username = new String(username.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
 
-        System.out.println("username"+username);
         //2.获取userService对象
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
         //3.获取当前用户的id
         Integer bossId = userService.getIdByName(username);
-
 
         Result<MyTeam> myTeamResult = userService.selectMyTeam(bossId);
 
@@ -278,10 +285,19 @@ public class UserServlet extends BaseServlet{
     * @Date: 2022/4/23
     */
     public void getSession(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("执行getsrsdion");
 
         HttpSession session = req.getSession();
         String username = (String) session.getAttribute("username");
-        JsonUtil.toJson(new Result(username),resp);
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+        Result<User> select = userService.select(username);
+        select.getData().setPassword("");
+
+//        System.out.println("getSession == " + username);
+        Result result = new Result(200,username,select.getData().getPosition());
+        System.out.println("result === "+ result);
+
+        JsonUtil.toJson(result,resp);
     }
 
     /**

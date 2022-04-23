@@ -50,24 +50,26 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Result getTaskCompleteByUserId(Integer userId) {
-        //以后必改,应该是递归算法
 
         //1.获取dao
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
 
-        //2.通过id,获取子任务总数(总负责人要看最低层的,其他人就看他低一层的,并且所属的人的任务情况)
+        //通过id,获取子任务总数(总负责人要看最低层的,其他人就看他低一层的,并且所属的人的任务情况)
 
         //2.通过用户id,获取用户对象
         User user = userDao.getUserByUserId(userId);
 
         //3.(总负责人)获取总任务id
         int generalId = user.getTaskId();
+        int taskId = user.getTaskId();
 
         List<Task> tasks = new ArrayList<>();
         String data;
         //3.是总负责人的话,那么要全部信息
         Integer position = user.getPosition();
+        //count:总的子任务数,noCompleteCount:子任务未完成的数量
+        int count = 0,completeCount = 0;
         if (position == 0) {
             //4.获取总任务的所有子任务
             List<Task> sonTasks= taskDao.getLittleTask(generalId);
@@ -76,23 +78,36 @@ public class TaskServiceImpl implements TaskService {
             for (Task sonTask : sonTasks) {
                 fatherTasksIds.add(sonTask.getParentTaskId());
             }
-            //count:总的子任务数,noCompleteCount:子任务未完成的数量
-            int count = 0,noCompleteCount = 0;
+
             //6.记录最底层任务的总数(可能是小工的,或者是包工头的,或者是上一级的)
             for (Task sonTask : sonTasks) {
                 //最低层的任务,一定没有任务是她的子任务
                 if(!fatherTasksIds.contains(sonTask.getTaskId())) {
                     count++;
                     if (sonTask.getStatus() == 1) {
-                        noCompleteCount++;
+                        completeCount++;
                     }
                 }
             }
             //数据展示
-            data = noCompleteCount + " / " + count;
-            return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),data);
+            data = completeCount + " / " + count;
+
+        }else{
+            List<Task> sonTasks = taskDao.getSonTasks(taskId + "");
+
+            count = sonTasks.size();
+            if (count == 0) {
+
+            }
+            for (Task sonTask : sonTasks) {
+                if (sonTask.getStatus() == 1) {
+                    completeCount++;
+                }
+            }
+            data = completeCount + " / " + count;
         }
-        return null;
+
+        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),data);
     }
 
     @Override
@@ -134,7 +149,17 @@ public class TaskServiceImpl implements TaskService {
                 //5.1.4把任务表中总任务是这一个的全部删除
                 taskDao.deleteTask(Integer.valueOf(taskId));
                 break;
+
+            //5.2 其他人
             default:
+                //5.2.1获取下级任务集合,对用户的任务id删除
+                for (Task sonTask : sonTasks) {
+                    userDao.deleteTask(sonTask.getTaskId());
+                    //5.2.2区别于总负责人,它需要删除下级的任务,但是,其他人只需要更改任务状态,不删除
+                    taskDao.updateStatus(sonTask.getTaskId());
+                }
+                //5.2.3最后把传进来的也设为完成
+                taskDao.updateStatus(Integer.parseInt(taskId));
         }
         return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }

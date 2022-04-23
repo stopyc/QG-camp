@@ -22,7 +22,7 @@ public interface TaskDao {
     Task getTaskByUserId(Integer idByName);
 
     /**
-     * 通过任务id集合获取子任务总数
+     * 通过任务id集合获取最子任务总数
      * @param generalTaskId
      * @return
      */
