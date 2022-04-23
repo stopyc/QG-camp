@@ -157,10 +157,18 @@ public class UserServlet extends BaseServlet{
      */
     public void selectMyTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        //1.登录后别的地方需要获取登录用户.
-        HttpSession session = req.getSession();
-        String  username = (String) session.getAttribute("username");
+//        //1.登录后别的地方需要获取登录用户.
+//        HttpSession session = req.getSession();
+//        String  username = (String) session.getAttribute("username");
 
+
+        //1.获取前端数据
+        BufferedReader reader = req.getReader();
+        String username = reader.readLine();
+
+        username = new String(username.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+
+        System.out.println("username"+username);
         //2.获取userService对象
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
@@ -260,6 +268,32 @@ public class UserServlet extends BaseServlet{
 
         //5.返回前端
         JsonUtil.toJson(result,resp);
+    }
+
+    /**
+    * @Description: 获取session
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/23
+    */
+    public void getSession(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession session = req.getSession();
+        String username = (String) session.getAttribute("username");
+        JsonUtil.toJson(new Result(username),resp);
+    }
+
+    /**
+    * @Description: 退出登录
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/23
+    */
+    public void loginOut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        session.removeAttribute("username");
     }
 
 }

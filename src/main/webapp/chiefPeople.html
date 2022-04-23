@@ -41,10 +41,11 @@
                 <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item>查看</el-dropdown-item>
                     <el-dropdown-item>新增</el-dropdown-item>
-                    <el-dropdown-item>删除</el-dropdown-item>
+<!--                    <el-dropdown-item @click="loginOut">退出登录</el-dropdown-item>-->
+                    <el-button type="text" @click="loginOut">退出登录</el-button>
                 </el-dropdown-menu>
             </el-dropdown>
-            <span>王小虎</span>
+            <el-tag v-model="username">{{username}}</el-tag>
         </el-header>
 
         <!--        我的任务列表-->
@@ -158,7 +159,7 @@
                 <!--                </el-table-column>-->
 
                 <el-table-column
-                        label="我的成员"
+                        label="我的成员(项目经理)"
                         width="180">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
@@ -230,6 +231,157 @@
                 </el-table-column>
             </el-table>
         </template>
+
+<!--        总负责人点击查询后的对话框-->
+
+        <el-dialog  :visible.sync=" engineeringTeamTableVisible" width="80%" :show-close="false" :close-on-click-modal="false">
+            <div slot="title" class="header-title">
+                <span style="font-size:18px;color:#333333;">工程队</span>
+                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;" @click="myCloseDialog">×</span>
+            </div>
+            <!--经理的工程队-->
+            <template>
+                <el-table
+                        :data="engineeringTeamTableData"
+                        style="width: 100%">
+
+                    <el-table-column
+                            label="成员(包工头)"
+                            width="180">
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="任务"
+                            width="200">
+                        <template slot-scope="scope">
+                            <div slot="reference" class="taskName">
+                                <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
+                            </div>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="难度"
+                            width="180"
+                            :formatter="levelFormatter"
+                    >
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="截止日期"
+                            width="200">
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="当前状态"
+                            width="180"
+                            :formatter="statusFormatter"
+                    >
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
+                        </template>
+                    </el-table-column>
+
+
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+
+                            <el-button
+                                    size="mini"
+                                    @click="handleQueryByForeman(scope.$index, scope.row)"
+                            >查看
+                            </el-button>
+
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </template>
+
+        </el-dialog>
+
+<!--        包工头下的工程小组详情对话框-->
+        <el-dialog  :visible.sync=" groupTableVisible" width="70%" :show-close="false" :close-on-click-modal="false">
+            <div slot="title" class="header-title">
+                <span style="font-size:18px;color:#333333;">工程小组</span>
+                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;" @click="myCloseDialog1">×</span>
+            </div>
+            <!--包工头的工程小组-->
+            <template>
+                <el-table
+                        :data="groupTableData"
+                        style="width: 100%">
+
+                    <el-table-column
+                            label="成员(小工)"
+                            width="180">
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="任务"
+                            width="200">
+                        <template slot-scope="scope">
+                            <div slot="reference" class="taskName">
+                                <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
+                            </div>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="难度"
+                            width="180"
+                            :formatter="levelFormatter"
+                    >
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="截止日期"
+                            width="200">
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="当前状态"
+                            width="180"
+                            :formatter="statusFormatter"
+                    >
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
+                        </template>
+                    </el-table-column>
+
+
+<!--                    <el-table-column label="操作">-->
+<!--                        <template slot-scope="scope">-->
+
+<!--                            <el-button-->
+<!--                                    size="mini"-->
+<!--                                    @click="handleQueryByForeman(scope.$index, scope.row)"-->
+<!--                            >查看-->
+<!--                            </el-button>-->
+
+<!--                        </template>-->
+<!--                    </el-table-column>-->
+                </el-table>
+            </template>
+
+        </el-dialog>
 
         <!--        对我的成员添加任务的对话框-->
         <el-dialog title="添加任务" :visible.sync="teamAddFormVisible">
@@ -394,9 +546,23 @@
 
         mounted() {
             //页面渲染结束后,发送异步请求,获取数据
-            this.selectMyTask();
-            this.selectMyTeam();
-            this.querySon();
+            // const username = window.sessionStorage.getItem("username");
+            // console.log("username = "+username);
+
+            // let myName = JSON.parse(sessionStorage.getItem("username"));
+            const _this = this;
+            axios({
+                method: "post",
+                url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
+            }).then(function (resp) {
+                _this.username = resp.data.msg;
+                _this.selectMyTask();
+                _this.selectMyTeam(resp.data.msg);
+                console.log(resp.data.msg);
+                _this.querySon();
+            })
+
+
         },
         data() {
 
@@ -444,7 +610,16 @@
             };
             return {
 
+                //工程小组详情表格
+                groupTableVisible:false,
+
+
+                //工程队详情表格
+                engineeringTeamTableVisible:false,
+
+                //排序
                 sort: '0',
+
                 //添加表单
                 dialogFormVisible: false,
                 teamAddFormVisible: false,
@@ -454,11 +629,9 @@
                 // 添加数据对话框是否展示的标记
                 dialogVisible: false,
 
-                //登录表单
-                user: {
-                    username: '',
-                    password: '',
-                },
+                //登录的用户名
+                username: '',
+
                 //表单校验
                 rules: {
                     taskName: [
@@ -525,7 +698,29 @@
                     generalId: '',
                 }],
 
-                // 队伍数据
+                //包工头下的队伍的数据
+                groupTableData:[{
+                    teamMemberName: '',
+                    taskName: '',
+                    level: '',
+                    deadline: '',
+                    status: '',
+                    userId: '',
+                    taskId: '',
+                }],
+
+                //项目经理下的队伍的数据
+                engineeringTeamTableData:[{
+                    teamMemberName: '',
+                    taskName: '',
+                    level: '',
+                    deadline: '',
+                    status: '',
+                    userId: '',
+                    taskId: '',
+                }],
+
+                // 总负责人下的队伍数据
                 teamTableData: [{
                     teamMemberName: '',
                     taskName: '',
@@ -545,6 +740,30 @@
         },
 
         methods: {
+            //退出登录
+            loginOut() {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/loginOut",
+                }).then(function (resp) {
+                    _this.$message.success("您已经退出登录");
+                    setTimeout(_this.out,1000);
+                })
+            },
+
+            //关闭对话框重置数据
+            myCloseDialog() {
+                this.engineeringTeamTableVisible = false
+                this.engineeringTeamTableData = ''
+
+
+            },
+            myCloseDialog1() {
+                this.groupTableVisible = false
+                this.groupTableData = ''
+
+            },
             //进队
             handleInMyTeam(index, row) {
                 const _this = this;
@@ -665,12 +884,55 @@
             },
 
             handleQuery(index, row) {
+                console.log(row.teamMemberName);
                 const _this = this;
                 if (row.userId === '') {
                     _this.$message.error("目前队伍没有成员");
                     return;
                 }
 
+                _this.engineeringTeamTableVisible = true;
+                console.log(row.teamMemberName);
+                let len, j;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam",
+                    data:row.teamMemberName,
+                }).then(function (resp) {
+                    if (resp.data.code === 200) {
+                        _this.engineeringTeamTableData = resp.data.data;
+                        for (j = 0, len = _this.engineeringTeamTableData.length; j < len; j++) {
+                            //时间转换
+                            _this.engineeringTeamTableData[j].deadline = _this.getMyDate(resp.data.data[j].deadline);
+                        }
+                    }
+                })
+            },
+
+            handleQueryByForeman(index, row) {
+                const _this = this;
+                if (row.userId === '') {
+                    _this.$message.error("目前队伍没有成员");
+                    return;
+                }
+                console.log(row.teamMemberName);
+
+                // _this.engineeringTeamTableVisible = false;
+                _this.groupTableVisible = true;
+                let len, j;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam",
+                    data:row.teamMemberName,
+                }).then(function (resp) {
+                    if (resp.data.code === 200) {
+                        _this.groupTableData = resp.data.data;
+                        for (j = 0, len = _this.groupTableData.length; j < len; j++) {
+                            //时间转换
+                            _this.groupTableData[j].deadline = _this.getMyDate(resp.data.data[j].deadline);
+                        }
+                    }
+                })
             },
 
             MyHandleDelete(index, row) {
@@ -709,13 +971,13 @@
             },
 
             //获取我的队伍的信息
-            selectMyTeam() {
-                //session存了当前登录者的姓名
+            selectMyTeam(username) {
                 const _this = this;
                 let len, j;
                 axios({
-                    method: "get",
-                    url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam"
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam",
+                    data:username,
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
                         _this.teamTableData = resp.data.data;
@@ -726,6 +988,7 @@
                     }
                 })
             },
+
 
             //添加表单
             addSubmit(formName) {
@@ -808,6 +1071,10 @@
 
             refresh() {
                 location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
+            },
+
+            out() {
+                location.href = "http://localhost:8080/qg-engineering-management-system/login.html";
             },
 
             handleCurrentChange(val) {

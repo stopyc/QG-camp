@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
         if (user == null) {
             //2.如果找不到这个用户,那么就是你密码输入错误了,用户名已经通过异步查询进行筛了一次了
-            return new Result<>(ResultEnum.PASSWORD_FAILED.getCode(),ResultEnum.PASSWORD_FAILED.getMsg());
+            return new Result<>(ResultEnum.PASSWORD_FAILED.getCode(),ResultEnum.PASSWORD_FAILED.getMsg(),-1);
         } else {
             //3.如果对象不为null,那么就表示找到了这个对象,表示成功了
             //4.登录成功,应该返回对象,但是不应该包含用户的敏感信息
