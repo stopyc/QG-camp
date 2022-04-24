@@ -7,6 +7,7 @@ import cn.stopyc.constant.SessionConstant;
 import cn.stopyc.po.Task;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
+import cn.stopyc.service.impl.TaskServiceImpl;
 import cn.stopyc.util.JsonUtil;
 import cn.stopyc.util.StringUtil;
 import com.alibaba.fastjson.JSON;
@@ -149,6 +150,32 @@ public class TaskServlet extends BaseServlet {
 
         //7.返回结果集
         JsonUtil.toJson(taskResult,resp);
+    }
+
+    /**
+    * @Description: 点击修改
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/24
+    */
+    public void modify(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //1.接受数据,并转换成java对象
+        BufferedReader reader = req.getReader();
+        String addTask = reader.readLine();
+
+        //2.转换成你要修改的任务对象;
+        Task task = JSON.parseObject(addTask, Task.class);
+
+        //3.获取service对象
+        TaskService taskService = SingletonFactory.getTaskServiceSingleton();
+
+        //4.调用方法,获取结果集
+        Result<Object> result = taskService.modify(task);
+
+        //5.返回结果集
+        JsonUtil.toJson(result,resp);
+
     }
 
 

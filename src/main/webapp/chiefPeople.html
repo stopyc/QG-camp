@@ -153,11 +153,6 @@
                     style="width: 100%"
                     height="250">
 
-                <!--                <el-table-column-->
-                <!--                        type="index"-->
-                <!--                        width="50">-->
-                <!--                </el-table-column>-->
-
                 <el-table-column
                         label="我的成员(项目经理)"
                         width="180">
@@ -225,6 +220,12 @@
                                 type="danger"
                                 @click="MyHandleDelete(scope.$index, scope.row)"
                         >踢出
+                        </el-button>
+
+                        <el-button
+                                size="mini"
+                                @click="handleModify(scope.$index, scope.row)"
+                        >修改
                         </el-button>
 
                     </template>
@@ -397,6 +398,33 @@
                 <el-form-item>
                     <el-button id="teamAddButton" type="primary" @click="teamAddTask('addTask')">添加</el-button>
                     <el-button @click="teamAddFormVisible = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+
+        <!--        对我的成员修改任务的对话框-->
+        <el-dialog title="修改任务" :visible.sync="teamModifyFormVisible">
+            <el-form ref="modifyTask" :model="modifyTask" label-width="80px" :rules="rules">
+                <el-form-item label="任务名称" prop="taskName">
+                    <el-input v-model="modifyTask.taskName" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="任务难度" prop="level">
+                    <template>
+                        <el-radio v-model="modifyTask.level" label="0">简单</el-radio>
+                        <el-radio v-model="modifyTask.level" label="1">困难</el-radio>
+                    </template>
+                </el-form-item>
+                <el-form-item label="截止时间" prop="deadline">
+                    <el-col :span="11">
+                        <el-date-picker type="date" placeholder="选择日期" v-model="modifyTask.deadline"
+                                        style="width: 100%;" autocomplete="off"></el-date-picker>
+                    </el-col>
+                    <el-col class="line" :span="2">-</el-col>
+
+                </el-form-item>
+                <el-form-item>
+                    <el-button id="teamModifyButton" type="primary" @click="teamModifyTask('modifyTask')">修改</el-button>
+                    <el-button @click="teamModifyFormVisible = false">取消</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
@@ -607,6 +635,7 @@
                 //添加表单
                 dialogFormVisible: false,
                 teamAddFormVisible: false,
+                teamModifyFormVisible: false,
 
                 // 当前页码
                 currentPage: 4,
@@ -648,6 +677,17 @@
 
                 //添加任务的表单
                 addTask: {
+                    taskName: '',
+                    level: '',
+                    deadline: '',
+                    status: '',
+                    taskId: '',
+                    userId: '',
+                    parentTaskId: '',
+                    generalId: '',
+                },
+
+                modifyTask:{
                     taskName: '',
                     level: '',
                     deadline: '',
@@ -730,6 +770,7 @@
             personInfo() {
                 window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
             },
+
             //退出登录
             loginOut() {
                 const _this = this;
@@ -754,6 +795,7 @@
                 this.groupTableData = ''
 
             },
+
             //进队
             handleInMyTeam(index, row) {
                 const _this = this;
@@ -853,6 +895,35 @@
                 });
             },
 
+
+            //修改任务
+            teamModifyTask(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const _this = this;
+                        _this.modifyTask.parentTaskId = _this.myTaskTableData[0].taskId;
+                        _this.modifyTask.generalId = _this.myTaskTableData[0].taskId;
+                        _this.modifyTask.status = 0;
+
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/task/modify",
+                            data: _this.modifyTask,
+                        }).then(function (resp) {
+                            if (resp.data.code === 200) {
+                                document.getElementById("teamModifyButton").disabled = true;
+                                _this.teamModifyFormVisible = false;
+                                _this.$message.success("任务修改成功");
+                                setTimeout(_this.refresh, 500);
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
+
+
             //对我的队伍的人添加任务
             handleAdd(index, row) {
                 const _this = this;
@@ -870,6 +941,25 @@
                     _this.teamAddFormVisible = true;
                 } else {
                     _this.$message.error("他已经有任务了");
+                }
+            },
+
+            handleModify(index,row) {
+                const _this = this;
+                if (row.userId === '') {
+                    _this.$message.error("目前队伍没有成员");
+                    return;
+                }
+                if (row.taskId === '' || row.taskId === 0) {
+                    _this.$message.error("他还没有任务,请先为他添加任务");
+                } else  {
+                    this.$refs.singleTable.setCurrentRow(row);
+                    _this.modifyTask.userId = row.userId;
+                    _this.modifyTask.taskId = row.taskId;
+                    _this.modifyTask.taskName = row.taskName;
+                    // _this.modifyTask.level = 1;
+                    _this.modifyTask.deadline = row.deadline;
+                    _this.teamModifyFormVisible = true;
                 }
             },
 
@@ -1159,7 +1249,6 @@
                     url: "http://localhost:8080/qg-engineering-management-system/task/selectMyTask"
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
-                        console.log("任务 " + resp.data.data)
                         _this.myTaskTableData = resp.data.data;
                         //时间转换
                         _this.myTaskTableData[0].deadline = _this.getMyDate(resp.data.data[0].deadline);

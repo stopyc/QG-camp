@@ -27,7 +27,7 @@
 
             <el-menu-item index="1">工程小组</el-menu-item>
 
-            <el-menu-item index="2">个人信息</el-menu-item>
+            <el-button @click="personInfo" target="_blank">个人信息</el-button>
 
             <el-menu-item index="3">消息通知</el-menu-item>
         </el-menu>
@@ -568,7 +568,7 @@
                     if (valid) {
                         const _this = this;
                         _this.addTask.parentTaskId = _this.myTaskTableData[0].taskId;
-                        _this.addTask.generalId = _this.myTaskTableData[0].taskId;
+                        _this.addTask.generalId = _this.myTaskTableData[0].generalId;
                         _this.addTask.status = 0;
                         axios({
                             method: "post",
@@ -773,6 +773,11 @@
                         _this.$message.error(resp.data.msg);
                     }
                 })
+            },
+
+            //个人信息跳转
+            personInfo() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
             },
 
             refresh() {

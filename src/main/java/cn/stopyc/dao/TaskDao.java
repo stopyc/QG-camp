@@ -3,6 +3,7 @@ package cn.stopyc.dao;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -84,4 +85,13 @@ public interface TaskDao {
      */
     List<Task> selectTasksByUsers(List<User> users);
 
+    /**
+     * 修改任务
+     * @param taskName:任务名称
+     * @param level:任务难度
+     * @param deadline:截止日期
+     * @param taskId:需要修改的任务id
+     */
+    void modifyTask(String taskName, Integer level, Date deadline, Integer taskId);
 }
+

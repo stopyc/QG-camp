@@ -5,6 +5,7 @@ import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
 import cn.stopyc.dao.TaskDao;
 import cn.stopyc.dao.UserDao;
+import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.TaskService;
@@ -227,6 +228,22 @@ public class TaskServiceImpl implements TaskService {
             //6.更新迭代器
             iterator = needDeleteTaskIds.iterator();
         }
+    }
+
+    @Override
+    public Result<Object> modify(Task task) {
+
+        //1.获取需要修改的任务的id
+        Integer taskId = task.getTaskId();
+
+        //2.获取dao
+        TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
+
+        //3.调用方法
+        taskDao.modifyTask(task.getTaskName(),task.getLevel(),task.getDeadline(),taskId);
+
+        //4.返回结果集
+        return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }
 
 

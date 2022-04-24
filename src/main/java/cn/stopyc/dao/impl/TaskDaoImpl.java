@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,6 +83,12 @@ public class TaskDaoImpl implements TaskDao {
         sb.append(")");
         String sql = sb.toString();
         return CRUDUtils.query(sql,new BeanListHandle<>(Task.class));
+    }
+
+    @Override
+    public void modifyTask(String taskName, Integer level, Date deadline, Integer taskId) {
+        String sql = "update `t_task` set `taskName`=?,`level`=?,`deadline`=? where `taskId`=?";
+        CRUDUtils.update(sql,taskName,level,TimeUtils.getStrFromDate(deadline),taskId);
     }
 
 

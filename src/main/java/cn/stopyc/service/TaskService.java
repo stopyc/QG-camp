@@ -61,4 +61,12 @@ public interface TaskService {
      * @param taskId:任务id
      */
     void deleteTask(Integer taskId);
+
+
+    /**
+     * 修改任务
+     * @param task:需要修改的任务
+     * @return :返回结果(成功与否)
+     */
+    Result<Object> modify(Task task);
 }
