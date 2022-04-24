@@ -13,8 +13,10 @@ import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
+import cn.stopyc.util.Md5Utils;
 import cn.stopyc.util.StringUtil;
 import cn.stopyc.util.TimeUtils;
+import sun.security.provider.MD5;
 
 import java.sql.Time;
 import java.util.ArrayList;
@@ -312,6 +314,41 @@ public class UserServiceImpl implements UserService {
 
         //3.调用进队方法
         userDao.inTeam(inTeamUserId,user.getUserId());
+
+        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+    }
+
+    @Override
+    public Result changePassword(String oldPassword, String newPassword,String username){
+
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+
+        //1.获取用户,校验密码是否正确,
+        User user = userDao.selectByName(username);
+
+        //2.不成功则直接返回
+        if (!Md5Utils.getMD5(oldPassword).equals(user.getPassword())) {
+            return new Result(ResultEnum.PASSWORD_FAILED.getCode(),ResultEnum.PASSWORD_FAILED.getMsg());
+        }
+
+        //3.成功就修改密码
+        userDao.changePassword(Md5Utils.getMD5(newPassword),user.getUserId());
+
+        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+
+
+
+    }
+
+    @Override
+    public Result modifyInfo(User user,String oldName) {
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+
+        //1.获取数据库中的该用户,
+        User user1 = userDao.selectByName(oldName);
+
+        //2.得到id进行修改对应信息
+        userDao.updateUser(user.getUserName(),user.getEmail(),user.getGender(),user1.getUserId());
 
         return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }

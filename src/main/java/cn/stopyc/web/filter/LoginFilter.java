@@ -30,7 +30,6 @@ public class LoginFilter implements Filter {
         }
 
         HttpSession session = request.getSession();
-        System.out.println("username");
         Object user = session.getAttribute("username");
 
         if (user == null) {

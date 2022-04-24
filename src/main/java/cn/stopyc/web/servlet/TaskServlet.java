@@ -41,6 +41,7 @@ public class TaskServlet extends BaseServlet {
         //1.登录后别的地方需要获取登录用户.
         HttpSession session = req.getSession();
         String  username = (String) session.getAttribute("username");
+        System.out.println("mytask"+username);
 
         //2.获取userService对象
         UserService userService = SingletonFactory.getUserServiceSingleton();

@@ -10,7 +10,7 @@ public enum ResultEnum {
     PARAMETER_NOT_VALID(400,"参数不合法"),
     DATABASE_ERROR(600,"数据库操作错误"),
     //用户模块 5002XX
-    PASSWORD_FAILED(500200,"用户名或密码错误"),
+    PASSWORD_FAILED(500200,"密码错误"),
     REPEAT_NAME(500210,"用户名重复"),
     FIND_USER_FAILED(500220,"用户名不存在"),
     CHECK_CODE_ERROR(500230,"验证码错误"),

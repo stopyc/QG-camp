@@ -13,6 +13,7 @@ import cn.stopyc.po.User;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
 import cn.stopyc.service.impl.TaskServiceImpl;
+import cn.stopyc.service.impl.UserServiceImpl;
 import cn.stopyc.util.CheckCodeUtil;
 import cn.stopyc.util.JsonUtil;
 import cn.stopyc.util.Md5Utils;
@@ -76,9 +77,7 @@ public class UserServlet extends BaseServlet{
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
         HttpSession session = req.getSession();
 
-        System.out.println("login == " + user.getUserName());
-
-        //6.设置sessionUserName不重复
+        //6.设置sessionUserName
         session.setAttribute("username",user.getUserName());
         JsonUtil.toJson(userResult,resp);
     }
@@ -86,7 +85,6 @@ public class UserServlet extends BaseServlet{
 
 
     public void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        req.setCharacterEncoding("UTF-8");
 //        //获取用户名,密码,验证码
 
         //1.获取前端数据(post)请求体
@@ -105,7 +103,6 @@ public class UserServlet extends BaseServlet{
 
     public void checkCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-//        response.setContentType("text/json;charset=utf-8");
 
         //1.获取前端数据(post)请求体
         BufferedReader reader = request.getReader();
@@ -141,7 +138,6 @@ public class UserServlet extends BaseServlet{
     * @Date: 2022/4/16
     */
     public void select(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        resp.setContentType("text/json;charset=utf-8");
         //1.获取前端数据(post)
         BufferedReader reader = req.getReader();
         String userStr = reader.readLine();
@@ -164,11 +160,6 @@ public class UserServlet extends BaseServlet{
      * @Date: 2022/4/19
      */
     public void selectMyTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-
-//        //1.登录后别的地方需要获取登录用户.
-//        HttpSession session = req.getSession();
-//        String  username = (String) session.getAttribute("username");
 
 
         //1.获取前端数据
@@ -285,17 +276,15 @@ public class UserServlet extends BaseServlet{
     * @Date: 2022/4/23
     */
     public void getSession(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("执行getsrsdion");
 
         HttpSession session = req.getSession();
         String username = (String) session.getAttribute("username");
+        System.out.println("username" + username);
         UserService userService = SingletonFactory.getUserServiceSingleton();
         Result<User> select = userService.select(username);
         select.getData().setPassword("");
 
-//        System.out.println("getSession == " + username);
-        Result result = new Result(200,username,select.getData().getPosition());
-        System.out.println("result === "+ result);
+        Result result = new Result(200,username,select.getData());
 
         JsonUtil.toJson(result,resp);
     }
@@ -310,6 +299,69 @@ public class UserServlet extends BaseServlet{
     public void loginOut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         session.removeAttribute("username");
+    }
+
+
+    /**
+    * @Description: 修改密码
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/24
+    */
+    public void changePassword(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //1.获取前端数据(第一个是老密码,第二个是新密码),因为不存在中文,所以不需要转码
+        BufferedReader reader = req.getReader();
+        String queryUserStr = reader.readLine();
+        String[] split = queryUserStr.split("&");
+
+        //2.获取修改的用户的名字
+        HttpSession session = req.getSession();
+        String username = (String) session.getAttribute("username");
+
+        //3.获取service
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+
+        //4.调用业务改变密码,获取结果集
+        Result result = userService.changePassword(split[0],split[1],username);
+
+        //5.返回结果集
+        JsonUtil.toJson(result,resp);
+    }
+
+    /**
+    * @Description:
+    * @Param: [req, resp]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/24
+    */
+    public void modifyInfo(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        //1.获取前端数据(post),第一个是修改后的条件对象,第二个是原来的用户
+        BufferedReader reader = req.getReader();
+        String userStr = reader.readLine();
+        userStr = new String(userStr.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        String[] split = userStr.split("&");
+
+
+        User user = JSON.parseObject(split[0], User.class);
+        System.out.println("user = "+ user);
+        System.out.println("username" + split[1]);
+
+        //2.获取service
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+
+        //3.调用方法,获取结果集
+        Result<Object> result = userService.modifyInfo(user,split[1]);
+
+        //4.成功的话,需要更新session
+        HttpSession session = req.getSession();
+        session.removeAttribute("username");
+        session.setAttribute("username",user.getUserName());
+
+        //5.返回结果集
+        JsonUtil.toJson(result,resp);
     }
 
 }

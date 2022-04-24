@@ -20,7 +20,7 @@ public interface UserService {
      * 登录功能
      * @param userName:用户姓名
      * @param password:用户密码
-     * @return
+     * @return 返回结果集(用户id)
      */
     Result<Integer> login(String userName, String password);
 
@@ -28,7 +28,7 @@ public interface UserService {
     /**
      * 根据用户名查询用户
      * @param userName:需要查询的用户姓名
-     * @return
+     * @return 返回结果集(查询到的用户)
      */
     Result<User> select(String userName);
 
@@ -37,7 +37,7 @@ public interface UserService {
      * 验证码校验
      * @param checkCode:用户输入
      * @param checkCodeGen:生成的
-     * @return
+     * @return 返回结果集(成功与否)
      */
     Result checkCheckCode(String checkCode,String checkCodeGen);
 
@@ -48,7 +48,7 @@ public interface UserService {
      * @param password:密码
      * @param email:邮箱
      * @param position:职位
-     * @return
+     * @return 返回结果集(注册用户)
      */
     Result<User> register(String userName, String password, String email, Integer position);
 
@@ -56,7 +56,7 @@ public interface UserService {
     /**
      * 通过用户名获取id
      * @param userName:用户名
-     * @return
+     * @return 返回用户id
      */
     Integer getIdByName(String userName);
 
@@ -64,7 +64,7 @@ public interface UserService {
     /**
      * 根据上级id查找队伍信息
      * @param bossId:上级id
-     * @return
+     * @return 返回结果集(队伍信息)
      */
     Result<MyTeam> selectMyTeam(Integer bossId);
 
@@ -79,7 +79,7 @@ public interface UserService {
     /**
      * 查询下级用户
      * @param queryUser:封装查询对象
-     * @return
+     * @return 返回结果集(查询用户)
      */
     Result<QueryUser> queryUser(User queryUser, Integer sort);
 
@@ -88,7 +88,26 @@ public interface UserService {
      * 进队业务
      * @param inTeamUserId:要进队的人的id
      * @param bossName:上级id
-     * @return
+     * @return 返回结果集(成功与否)
      */
     Result inTeam(Integer inTeamUserId, String bossName);
+
+
+    /**
+     * 改变用户密码
+     * @param oldPassword:老密码
+     * @param newPassword:新密码
+     * @param username:用户姓名
+     * @return 返回结果集(成功与否)
+     */
+    Result changePassword(String oldPassword, String newPassword,String username);
+
+
+    /**
+     * 修改用户信息
+     * @param user:用户新的信息条件
+     * @param oldName:老用户的名字
+     * @return 返回结果集(成功与否)
+     */
+    Result<Object> modifyInfo(User user,String oldName);
 }

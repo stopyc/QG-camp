@@ -26,7 +26,9 @@
 
             <el-menu-item index="1">管理团队</el-menu-item>
 
-            <el-menu-item index="2" ><el-button @click="personInfo" target="_blank">个人信息</el-button></el-menu-item>
+            <el-menu-item index="2">
+                <el-button @click="personInfo" target="_blank">个人信息</el-button>
+            </el-menu-item>
 
             <el-menu-item index="3">消息通知</el-menu-item>
         </el-menu>
@@ -230,11 +232,13 @@
             </el-table>
         </template>
 
-<!--        总负责人点击查询后的对话框-->
-        <el-dialog  :visible.sync=" engineeringTeamTableVisible" width="80%" :show-close="false" :close-on-click-modal="false">
+        <!--        总负责人点击查询后的对话框-->
+        <el-dialog :visible.sync=" engineeringTeamTableVisible" width="80%" :show-close="false"
+                   :close-on-click-modal="false">
             <div slot="title" class="header-title">
                 <span style="font-size:18px;color:#333333;">工程队</span>
-                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;" @click="myCloseDialog">×</span>
+                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;"
+                      @click="myCloseDialog">×</span>
             </div>
             <!--经理的工程队-->
             <template>
@@ -305,11 +309,12 @@
 
         </el-dialog>
 
-<!--        包工头下的工程小组详情对话框-->
-        <el-dialog  :visible.sync=" groupTableVisible" width="70%" :show-close="false" :close-on-click-modal="false">
+        <!--        包工头下的工程小组详情对话框-->
+        <el-dialog :visible.sync=" groupTableVisible" width="70%" :show-close="false" :close-on-click-modal="false">
             <div slot="title" class="header-title">
                 <span style="font-size:18px;color:#333333;">工程小组</span>
-                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;" @click="myCloseDialog1">×</span>
+                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;"
+                      @click="myCloseDialog1">×</span>
             </div>
             <!--包工头的工程小组-->
             <template>
@@ -389,8 +394,9 @@
                     <el-col class="line" :span="2">-</el-col>
 
                 </el-form-item>
-                <el-button id="teamAddButton" type="primary" @click="teamAddTask('addTask')">添加</el-button>
-                <el-button @click="teamAddFormVisible = false">取消</el-button>
+                <el-form-item>
+                    <el-button id="teamAddButton" type="primary" @click="teamAddTask('addTask')">添加</el-button>
+                    <el-button @click="teamAddFormVisible = false">取消</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
@@ -458,8 +464,8 @@
                         width="200"
                         :formatter="genderFormatter">
                     <template slot-scope="scope">
-<!--                        <el-tag size="medium">{{ scope.row.gender }}</el-tag>-->
-                        <span style="medium: 10px">{{genderFormatter( scope.row.gender) }}</span>
+                        <!--                        <el-tag size="medium">{{ scope.row.gender }}</el-tag>-->
+                        <span style="medium: 10px">{{genderFormatter(scope.row.gender) }}</span>
 
                     </template>
                 </el-table-column>
@@ -542,11 +548,10 @@
                 method: "post",
                 url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
             }).then(function (resp) {
-                console.log(resp.data);
                 _this.username = resp.data.msg;
+                console.log("111 " + _this.username);
                 _this.selectMyTask();
                 _this.selectMyTeam(resp.data.msg);
-                console.log(resp.data.msg);
                 _this.querySon();
             })
         },
@@ -587,20 +592,14 @@
                 }
             };
 
-
-            const item = {
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            };
             return {
 
                 //工程小组详情表格
-                groupTableVisible:false,
+                groupTableVisible: false,
 
 
                 //工程队详情表格
-                engineeringTeamTableVisible:false,
+                engineeringTeamTableVisible: false,
 
                 //排序
                 sort: '0',
@@ -684,7 +683,7 @@
                 }],
 
                 //包工头下的队伍的数据
-                groupTableData:[{
+                groupTableData: [{
                     teamMemberName: '',
                     taskName: '',
                     level: '',
@@ -695,7 +694,7 @@
                 }],
 
                 //项目经理下的队伍的数据
-                engineeringTeamTableData:[{
+                engineeringTeamTableData: [{
                     teamMemberName: '',
                     taskName: '',
                     level: '',
@@ -728,8 +727,8 @@
         methods: {
 
             //个人信息跳转
-            personInfo(){
-                window.location.replace("http://localhost:8080/qg-engineering-management-system/personalInfo.html");
+            personInfo() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
             },
             //退出登录
             loginOut() {
@@ -739,7 +738,7 @@
                     url: "http://localhost:8080/qg-engineering-management-system/user/loginOut",
                 }).then(function (resp) {
                     _this.$message.success("您已经退出登录");
-                    setTimeout(_this.out,1000);
+                    setTimeout(_this.out, 1000);
                 })
             },
 
@@ -761,11 +760,11 @@
                 //如果要进队的人有上属的话,那么就不能进队
                 if (row.bossId !== '' && row.bossId !== 0) {
                     _this.$message.error("该成员已经有所属的队伍了");
-                    return ;
+                    return;
                 }
                 if (row.userId === '' || row.userId === 0) {
                     _this.$message.error("目前没有公司还没有项目经理");
-                    return ;
+                    return;
                 }
 
                 this.$confirm('确认他加入队伍?', '提示', {
@@ -822,7 +821,7 @@
                             //时间转换
                             _this.allManager[j].hireDate = _this.getMyDate(resp.data.data[j].hireDate);
                         }
-                    }else if (resp.data.code === 800200) {
+                    } else if (resp.data.code === 800200) {
                         _this.$message.error(resp.data.msg);
                     }
                 })
@@ -888,7 +887,7 @@
                 axios({
                     method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam",
-                    data:row.teamMemberName,
+                    data: row.teamMemberName,
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
                         _this.engineeringTeamTableData = resp.data.data;
@@ -914,7 +913,7 @@
                 axios({
                     method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam",
-                    data:row.teamMemberName,
+                    data: row.teamMemberName,
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
                         _this.groupTableData = resp.data.data;
@@ -968,7 +967,7 @@
                 axios({
                     method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/user/selectMyTeam",
-                    data:username,
+                    data: username,
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
                         _this.teamTableData = resp.data.data;
@@ -1039,7 +1038,7 @@
                 const _this = this;
                 if (row.taskId === '' || row.taskId === 0) {
                     _this.$message.error("当前没有任务");
-                    return ;
+                    return;
                 }
 
                 axios({
@@ -1098,7 +1097,7 @@
             genderFormatter(gender) {
                 if (gender === 0) {
                     return "女";
-                } else if (gender === 1){
+                } else if (gender === 1) {
                     return "男";
                 }
             },
@@ -1156,10 +1155,11 @@
                 //session存了当前登录者的姓名
                 const _this = this;
                 axios({
-                    method: "get",
+                    method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/task/selectMyTask"
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
+                        console.log("任务 " + resp.data.data)
                         _this.myTaskTableData = resp.data.data;
                         //时间转换
                         _this.myTaskTableData[0].deadline = _this.getMyDate(resp.data.data[0].deadline);

@@ -44,6 +44,7 @@ public class TaskServiceImpl implements TaskService {
         //4.有的话就以集合的形式返回,(前端接受表格)
             List<Task> list = new ArrayList<>();
             list.add(task);
+            System.out.println("task = " + list);
             return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),list);
         }
     }

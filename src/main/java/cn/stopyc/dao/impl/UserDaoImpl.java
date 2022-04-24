@@ -1,7 +1,6 @@
 package cn.stopyc.dao.impl;
 
 import cn.stopyc.dao.UserDao;
-import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.impl.BeanHandler;
 import cn.stopyc.service.impl.BeanListHandle;
@@ -113,5 +112,15 @@ public class UserDaoImpl implements UserDao {
         CRUDUtils.update(sql,userId,inTeamUserId);
     }
 
+    @Override
+    public void changePassword(String newPassword, Integer userId) {
+        String sql = "update `t_user` set `password`=? where `userId`=?";
+        CRUDUtils.update(sql,newPassword,userId);
+    }
 
+    @Override
+    public void updateUser(String userName, String email, String gender, Integer userId) {
+        String sql = "update `t_user` set `userName`=?,`email`=?,`gender`=? where `userId`=?";
+        CRUDUtils.update(sql,userName,email,gender,userId);
+    }
 }
