@@ -114,7 +114,7 @@
             </template>
         </el-form>
 
-
+        <el-divider></el-divider>
         <!--经理的工程队的队伍-->
         <template>
             <el-table
@@ -358,6 +358,7 @@
                 <el-button type="primary" @click="querySon">查询</el-button>
             </el-form-item>
         </el-form>
+        <el-divider></el-divider>
 
         <!--        所有包工头信息展示-->
         <template>
@@ -445,6 +446,12 @@
 <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
 
 
+
+<!--<script type="module">-->
+<!--    import global from './js/global.js'-->
+<!--    Vue.prototype.global = global-->
+<!--</script>-->
+
 <script>
 
 
@@ -470,7 +477,8 @@
                 _this.querySon();
             })
 
-
+            //建立ws连接
+            _this.createWebSocket();
         },
         data() {
 
@@ -649,6 +657,81 @@
         },
 
         methods: {
+            createWebSocket() {
+
+                // var heartCheck = {
+                //     timeout: 1000,        //1分钟发一次心跳
+                //     timeoutObj: null,
+                //     serverTimeoutObj: null,
+                //     reset: function(){
+                //         clearTimeout(this.timeoutObj);
+                //         clearTimeout(this.serverTimeoutObj);
+                //         return this;
+                //     },
+                //     start: function(){
+                //         var _this = this;
+                //         this.timeoutObj = setTimeout(function(){
+                //             //这里发送一个心跳，后端收到后，返回一个心跳消息，
+                //             //onmessage拿到返回的心跳就说明连接正常
+                //             _this.handleMsg("ping");
+                //             console.log("ping!")
+                //             _this.serverTimeoutObj = setTimeout(function(){//如果超过一定时间还没重置，说明后端主动断开了
+                //                 _this.websocket.close();     //如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
+                //             }, _this.timeout)
+                //         }, this.timeout)
+                //     }
+                // };
+
+                const _this = this;
+                _this.websocket = new WebSocket('ws://localhost:8080/qg-engineering-management-system/webSocket')
+                // _this.global.setWs(_this.websocket);
+                // 连接成功时
+
+                // _this.websocket.onopen = _this.onopen();
+                _this.websocket.onopen = () => {
+                    // heartCheck.reset().start();
+                    console.log('连接成功')
+                    // _this.websocket.send("点击提交后的信息");
+                }
+                _this.websocket.onmessage = event => {
+                    // 后端发送的消息在event.data中
+                    console.log("后台发送消息")
+                    console.log(event.data)
+                    _this.myMsg = event.data;
+                    const h = this.$createElement;
+
+                    this.$notify({
+                        title: '消息通知',
+                        message: h('i', { style: 'color: teal'}, event.data)
+                    });
+                }
+                _this.websocket.onclose = function (e) {
+                    console.log('关闭了',e.code + ' ' + e.reason + ' ' + e.wasClean);
+                }
+                // // 路由跳转时结束websocket链接
+                // this.$router.afterEach(function () {
+                //     websocket.close()
+                // })
+                // 监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
+                window.onbeforeunload = function () {
+                    _this.websocket.close()
+                }
+            },
+
+
+
+            // handleMsg(msg) {
+            //     let that = this;
+            //     console.log(that.global.ws);
+            //     if (that.global.ws && that.global.ws.readyState === 1) {
+            //         console.log("发送信息", msg);
+            //         that.global.ws.send(msg);
+            //     }
+            //     that.global.ws.onmessage =  event => {
+            //         console.log("收到服务器内容", event.data);
+            //         that.$message.success(event.data);
+            //     };
+            // },
             //退出登录
             loginOut() {
                 const _this = this;

@@ -31,7 +31,15 @@
     </build>
 
     <dependencies>
-<!--serlvet-->
+
+        <!--      使用java-api中的websocket-->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--servlet-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>

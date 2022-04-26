@@ -18,6 +18,7 @@ import cn.stopyc.util.CheckCodeUtil;
 import cn.stopyc.util.JsonUtil;
 import cn.stopyc.util.Md5Utils;
 import cn.stopyc.util.StringUtil;
+import cn.stopyc.web.ws.WebSocket;
 import com.alibaba.fastjson.JSON;
 
 import javax.servlet.ServletException;
@@ -297,8 +298,15 @@ public class UserServlet extends BaseServlet{
     * @Date: 2022/4/23
     */
     public void loginOut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        //1.获取谁退出登录
         HttpSession session = req.getSession();
-        session.removeAttribute("username");
+        String username = (String) session.getAttribute("username");
+//        session.removeAttribute("username");
+
+        //2.获取service
+        UserService userService = SingletonFactory.getUserServiceSingleton();
+        userService.loginOut(username);
     }
 
 

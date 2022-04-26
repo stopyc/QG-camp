@@ -11,11 +11,13 @@ import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.dao.impl.UserDaoImpl;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
+import cn.stopyc.service.NoticeService;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
 import cn.stopyc.util.Md5Utils;
 import cn.stopyc.util.StringUtil;
 import cn.stopyc.util.TimeUtils;
+import cn.stopyc.web.ws.WebSocket;
 import sun.security.provider.MD5;
 
 import java.sql.Time;
@@ -36,7 +38,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 私有构造器
      */
-    private UserServiceImpl(){
+    private UserServiceImpl() {
 
     }
 
@@ -50,13 +52,53 @@ public class UserServiceImpl implements UserService {
 
         if (user == null) {
             //2.如果找不到这个用户,那么就是你密码输入错误了,用户名已经通过异步查询进行筛了一次了
-            return new Result<>(ResultEnum.PASSWORD_FAILED.getCode(),ResultEnum.PASSWORD_FAILED.getMsg(),-1);
+            return new Result<>(ResultEnum.PASSWORD_FAILED.getCode(), ResultEnum.PASSWORD_FAILED.getMsg(), -1);
         } else {
             //3.如果对象不为null,那么就表示找到了这个对象,表示成功了
             //4.登录成功,应该返回对象,但是不应该包含用户的敏感信息
             user.setPassword("");
-            return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(),user.getPosition());
+
+            //5.发送消息
+            sendNotice(userName + "已上线", user);
+
+            //6.返回结果集
+            return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), user.getPosition());
         }
+    }
+
+    /**
+    * @Description: 发送实时和离线通知
+    * @Param: [msg, user]
+    * @return: void
+    * @Author: stop.yc
+    * @Date: 2022/4/26
+    */
+    private void sendNotice(String msg, User user) {
+
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+        //1.发送实时消息给下级和上级,首先通过用户id获取上下级的用户id,
+        List<String> usernames = new ArrayList<>();
+
+        //2.获取上级
+        User boss = userDao.getUserByUserId(user.getBossId());
+        if (null != boss) {
+            usernames.add(boss.getUserName());
+        }
+
+        //3.获取下级
+        List<User> sonUser = userDao.getSonUser(user.getUserId());
+        for (User u : sonUser) {
+            usernames.add(u.getUserName());
+        }
+
+        //4.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
+        if (!msg.contains("上线") || msg.contains("离线")) {
+            NoticeService noticeService = SingletonFactory.getNoticeServiceSingleton();
+            noticeService.sendNotice(user,usernames,msg);
+        }
+
+        //5.发送实时通知
+        WebSocket.sendMessage(new Result<>(200, msg, usernames));
     }
 
     @Override
@@ -68,12 +110,12 @@ public class UserServiceImpl implements UserService {
 
         if (user == null) {
             //2.如果找不到这个用户,提示用户名不存在
-            return new Result<>(ResultEnum.FIND_USER_FAILED.getCode(),ResultEnum.FIND_USER_FAILED.getMsg());
+            return new Result<>(ResultEnum.FIND_USER_FAILED.getCode(), ResultEnum.FIND_USER_FAILED.getMsg());
         } else {
             //3.如果对象不为null,那么就表示找到了这个对象,表示有重复名
             //4.登录成功,应该返回对象,但是不应该包含用户的敏感信息
             //5.注册失焦,重复名
-            return new Result<>(ResultEnum.REPEAT_NAME.getCode(), ResultEnum.REPEAT_NAME.getMsg(),user);
+            return new Result<>(ResultEnum.REPEAT_NAME.getCode(), ResultEnum.REPEAT_NAME.getMsg(), user);
         }
     }
 
@@ -81,8 +123,8 @@ public class UserServiceImpl implements UserService {
     public Result checkCheckCode(String checkCode, String checkCodeGen) {
         //验证码对了
         if (StringUtil.isEmpty(checkCode) || !checkCode.equalsIgnoreCase(checkCodeGen)) {
-            return new Result(ResultEnum.CHECK_CODE_ERROR.getCode(),ResultEnum.CHECK_CODE_ERROR.getMsg());
-        }else {
+            return new Result(ResultEnum.CHECK_CODE_ERROR.getCode(), ResultEnum.CHECK_CODE_ERROR.getMsg());
+        } else {
             return new Result(200);
         }
     }
@@ -97,13 +139,13 @@ public class UserServiceImpl implements UserService {
         String strFromCurrentTime = TimeUtils.getStrFromCurrentTime(System.currentTimeMillis());
 
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
-        int i = userDao.insertNewOne(userName,password,email,position,"1",strFromCurrentTime);
+        int i = userDao.insertNewOne(userName, password, email, position, "1", strFromCurrentTime);
 
         //成功注册
         if (i > 0) {
-            return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
-        }else {
-            return new Result<>(ResultEnum.DATABASE_ERROR.getCode(),ResultEnum.DATABASE_ERROR.getMsg());
+            return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
+        } else {
+            return new Result<>(ResultEnum.DATABASE_ERROR.getCode(), ResultEnum.DATABASE_ERROR.getMsg());
         }
     }
 
@@ -130,7 +172,7 @@ public class UserServiceImpl implements UserService {
             Integer bossIdOfWorker = worker.getBossId();
             //5.没有上级,那么他就没有队伍
             if (null == bossIdOfWorker || 0 == bossIdOfWorker) {
-                return new Result<>(ResultEnum.NO_TEAM.getCode(),ResultEnum.NO_TEAM.getMsg());
+                return new Result<>(ResultEnum.NO_TEAM.getCode(), ResultEnum.NO_TEAM.getMsg());
             }
             //6.有上级,那么就要获取他上级手下的成员
             users = userDao.getSonUser(bossIdOfWorker);
@@ -139,7 +181,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (users.size() == 0) {
-            return new Result<>(ResultEnum.NO_TEAM.getCode(),ResultEnum.NO_TEAM.getMsg());
+            return new Result<>(ResultEnum.NO_TEAM.getCode(), ResultEnum.NO_TEAM.getMsg());
         }
 
         //2.平移,获取taskService对象
@@ -161,7 +203,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),myTeams);
+        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), myTeams);
     }
 
     @Override
@@ -172,6 +214,8 @@ public class UserServiceImpl implements UserService {
         needChangeIds.add(userId);
         //1.拿dao
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
+        User userByUserId = userDao.getUserByUserId(userId);
+        User boss = userDao.getUserByUserId(userByUserId.getBossId());
 
         //2.被踢的这个人单独处理,他的上级没有了,但是下级还在,表示他的下级的bossId没有发生变化.
         //删除bossId
@@ -179,7 +223,7 @@ public class UserServiceImpl implements UserService {
 
         Iterator<Integer> iterator = needChangeIds.iterator();
 
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             //3.获取需要删除任务的用户id
             Integer id = iterator.next();
             //4.删除
@@ -195,10 +239,13 @@ public class UserServiceImpl implements UserService {
             //8.重要!!更新迭代器!
             iterator = needChangeIds.iterator();
         }
+
+        //10.发送消息
+        sendNotice(userByUserId.getUserName() + "已被踢出队伍",boss);
     }
 
     @Override
-    public Result<QueryUser> queryUser(User user,Integer sort) {
+    public Result<QueryUser> queryUser(User user, Integer sort) {
         //1.获取dao
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
@@ -220,7 +267,7 @@ public class UserServiceImpl implements UserService {
         //5.职位 ,-1表示全部职位
         if (user.getPosition() != -1) {
             sb.append("and `position`=? ");
-            conditions.add(user.getPosition()+"");
+            conditions.add(user.getPosition() + "");
         }
 
         //6.性别,-1表示全部性别
@@ -234,7 +281,7 @@ public class UserServiceImpl implements UserService {
             //有上级
             if (user.getBossId() == 1) {
                 sb.append("and (`bossId`!= '0' and `bossId` IS NOT NULL)");
-            }else {
+            } else {
                 sb.append("and (`bossId`='0' or `bossId` IS NULL)");
             }
         }
@@ -258,11 +305,11 @@ public class UserServiceImpl implements UserService {
         }
 
         String sql = sb.toString();
-        List<User> users = userDao.selectByConditions(sql,conditions.toArray());
+        List<User> users = userDao.selectByConditions(sql, conditions.toArray());
 
         //找不到用户
-        if(users.size() == 0) {
-            return new Result<>(ResultEnum.NOT_FOUND.getCode(),ResultEnum.NOT_FOUND.getMsg());
+        if (users.size() == 0) {
+            return new Result<>(ResultEnum.NOT_FOUND.getCode(), ResultEnum.NOT_FOUND.getMsg());
         }
         //现在已经拿到了用户数据,现在需要封装数据返回前端
 
@@ -273,16 +320,16 @@ public class UserServiceImpl implements UserService {
         List<User> bosses = userDao.selectBossesByUsers(users);
 
         List<QueryUser> queryUsers = new ArrayList<>();
-        for (User u :users) {
+        for (User u : users) {
             //没有任务
             if (null == u.getTaskId() || 0 == u.getTaskId()) {
                 //没有上属
-                if (null == u.getBossId() || 0 ==u.getBossId()) {
-                    queryUsers.add(new QueryUser(u.getUserId(),u.getUserName(),Integer.parseInt(u.getGender()),0,"无上属",0, "无任务",u.getHireDate()));
-                }else {
+                if (null == u.getBossId() || 0 == u.getBossId()) {
+                    queryUsers.add(new QueryUser(u.getUserId(), u.getUserName(), Integer.parseInt(u.getGender()), 0, "无上属", 0, "无任务", u.getHireDate()));
+                } else {
                     for (User boss : bosses) {
                         if (boss.getUserId().equals(u.getBossId())) {
-                            queryUsers.add(new QueryUser(u.getUserId(),u.getUserName(),Integer.parseInt(u.getGender()),0,boss.getUserName(),boss.getUserId(), "无任务",u.getHireDate()));
+                            queryUsers.add(new QueryUser(u.getUserId(), u.getUserName(), Integer.parseInt(u.getGender()), 0, boss.getUserName(), boss.getUserId(), "无任务", u.getHireDate()));
                             break;
                         }
                     }
@@ -293,14 +340,14 @@ public class UserServiceImpl implements UserService {
                 if (u.getTaskId().equals(task.getTaskId())) {
                     for (User boss : bosses) {
                         if (boss.getUserId().equals(u.getBossId())) {
-                            queryUsers.add(new QueryUser(u.getUserId(),u.getUserName(),Integer.parseInt(u.getGender()),task.getTaskId(),boss.getUserName(),boss.getUserId(), task.getTaskName(),u.getHireDate()));
+                            queryUsers.add(new QueryUser(u.getUserId(), u.getUserName(), Integer.parseInt(u.getGender()), task.getTaskId(), boss.getUserName(), boss.getUserId(), task.getTaskName(), u.getHireDate()));
                             break;
                         }
                     }
                 }
             }
         }
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),queryUsers);
+        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), queryUsers);
     }
 
     @Override
@@ -313,13 +360,19 @@ public class UserServiceImpl implements UserService {
         User user = userDao.selectByName(bossName);
 
         //3.调用进队方法
-        userDao.inTeam(inTeamUserId,user.getUserId());
+        userDao.inTeam(inTeamUserId, user.getUserId());
 
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+        //4.获取进队的人的姓名
+        User userByUserId = userDao.getUserByUserId(inTeamUserId);
+
+        //5.发送消息
+        sendNotice(userByUserId.getUserName()+"进入了"+bossName+"的队伍",user);
+
+        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
     }
 
     @Override
-    public Result changePassword(String oldPassword, String newPassword,String username){
+    public Result changePassword(String oldPassword, String newPassword, String username) {
 
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
 
@@ -328,29 +381,38 @@ public class UserServiceImpl implements UserService {
 
         //2.不成功则直接返回
         if (!Md5Utils.getMD5(oldPassword).equals(user.getPassword())) {
-            return new Result(ResultEnum.PASSWORD_FAILED.getCode(),ResultEnum.PASSWORD_FAILED.getMsg());
+            return new Result(ResultEnum.PASSWORD_FAILED.getCode(), ResultEnum.PASSWORD_FAILED.getMsg());
         }
 
         //3.成功就修改密码
-        userDao.changePassword(Md5Utils.getMD5(newPassword),user.getUserId());
+        userDao.changePassword(Md5Utils.getMD5(newPassword), user.getUserId());
 
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
-
+        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
 
 
     }
 
     @Override
-    public Result modifyInfo(User user,String oldName) {
+    public Result modifyInfo(User user, String oldName) {
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
 
         //1.获取数据库中的该用户,
         User user1 = userDao.selectByName(oldName);
 
         //2.得到id进行修改对应信息
-        userDao.updateUser(user.getUserName(),user.getEmail(),user.getGender(),user1.getUserId());
+        userDao.updateUser(user.getUserName(), user.getEmail(), user.getGender(), user1.getUserId());
 
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
+    }
+
+    @Override
+    public void loginOut(String username) {
+
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+
+        User user = userDao.selectByName(username);
+
+        sendNotice(username + "已下线", user);
     }
 }
 

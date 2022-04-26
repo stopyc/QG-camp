@@ -1,8 +1,11 @@
 package cn.stopyc.bean;
 
+import cn.stopyc.dao.NoticeDao;
 import cn.stopyc.dao.TaskDao;
+import cn.stopyc.dao.impl.NoticeDaoImpl;
 import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.dao.impl.UserDaoImpl;
+import cn.stopyc.service.impl.NoticeServiceImpl;
 import cn.stopyc.service.impl.TaskServiceImpl;
 import cn.stopyc.service.impl.UserServiceImpl;
 
@@ -19,18 +22,22 @@ public class SingletonFactory {
 
     private static UserServiceImpl userServiceSingleton;
     private static TaskServiceImpl taskServiceSingleton;
+    private static NoticeServiceImpl noticeServiceSingleton;
 
     private static UserDaoImpl userDaoSingleton;
     private static TaskDaoImpl taskDaoSingleton;
+    private static NoticeDaoImpl noticeDaoSingleton;
 
     static {
         try {
 
             userServiceSingleton = (UserServiceImpl)getSingleByName(UserServiceImpl.class.getName());
             taskServiceSingleton = (TaskServiceImpl)getSingleByName(TaskServiceImpl.class.getName());
+            noticeServiceSingleton = (NoticeServiceImpl)getSingleByName(NoticeServiceImpl.class.getName());
 
             userDaoSingleton = (UserDaoImpl)getSingleByName(UserDaoImpl.class.getName());
             taskDaoSingleton = (TaskDaoImpl)getSingleByName(TaskDaoImpl.class.getName());
+            noticeDaoSingleton = (NoticeDaoImpl)getSingleByName(NoticeDaoImpl.class.getName());
 
 
         } catch (Exception e) {
@@ -53,13 +60,16 @@ public class SingletonFactory {
 
     /**
      * 调用并返回单例
-     * @return
+     * @return : 单例对象
      */
     public static UserServiceImpl getUserServiceSingleton() {
         return userServiceSingleton;
     }
     public static TaskServiceImpl getTaskServiceSingleton() {
         return taskServiceSingleton;
+    }
+    public static NoticeServiceImpl getNoticeServiceSingleton() {
+        return noticeServiceSingleton;
     }
 
 
@@ -68,6 +78,9 @@ public class SingletonFactory {
     }
     public static TaskDaoImpl getTaskDaoSingleton() {
         return taskDaoSingleton;
+    }
+    public static NoticeDaoImpl getNoticeDaoSingleton() {
+        return noticeDaoSingleton;
     }
 
 }

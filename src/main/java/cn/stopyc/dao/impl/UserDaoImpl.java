@@ -123,4 +123,5 @@ public class UserDaoImpl implements UserDao {
         String sql = "update `t_user` set `userName`=?,`email`=?,`gender`=? where `userId`=?";
         CRUDUtils.update(sql,userName,email,gender,userId);
     }
+
 }

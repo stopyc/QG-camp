@@ -8,8 +8,10 @@ import cn.stopyc.dao.UserDao;
 import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
+import cn.stopyc.service.NoticeService;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.util.StringUtil;
+import cn.stopyc.web.ws.WebSocket;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -163,6 +165,10 @@ public class TaskServiceImpl implements TaskService {
                 //5.2.3最后把传进来的也设为完成
                 taskDao.updateStatus(Integer.parseInt(taskId));
         }
+
+        //6.发送消息
+        sendNotice(user.getUserName() + "已完成任务", user);
+
         return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }
 
@@ -189,6 +195,9 @@ public class TaskServiceImpl implements TaskService {
 
         //6.为用户添加任务
         userDao.addTaskId(taskByUserId.getTaskId(),userId);
+
+        //7.发送消息
+        sendNotice(user.getUserName() + "获得了一个新任务", user);
 
         return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }
@@ -238,12 +247,54 @@ public class TaskServiceImpl implements TaskService {
 
         //2.获取dao
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+
+        User userByTaskId = userDao.getUserByTaskId(taskId + "");
 
         //3.调用方法
         taskDao.modifyTask(task.getTaskName(),task.getLevel(),task.getDeadline(),taskId);
 
-        //4.返回结果集
+        //5.发送消息
+        sendNotice(userByTaskId.getUserName() + "已上线", userByTaskId);
+
+        //6.返回结果集
         return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+    }
+
+
+    /**
+     * @Description: 发送实时和离线通知
+     * @Param: [msg, user]
+     * @return: void
+     * @Author: stop.yc
+     * @Date: 2022/4/26
+     */
+    private void sendNotice(String msg, User user) {
+
+        UserDao userDao = SingletonFactory.getUserDaoSingleton();
+        //1.发送实时消息给下级和上级,首先通过用户id获取上下级的用户id,
+        List<String> usernames = new ArrayList<>();
+
+        //2.获取上级
+        User boss = userDao.getUserByUserId(user.getBossId());
+        if (null != boss) {
+            usernames.add(boss.getUserName());
+        }
+
+        //3.获取下级
+        List<User> sonUser = userDao.getSonUser(user.getUserId());
+        for (User u : sonUser) {
+            usernames.add(u.getUserName());
+        }
+
+        //4.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
+        if (!msg.contains("上线") || msg.contains("离线")) {
+            NoticeService noticeService = SingletonFactory.getNoticeServiceSingleton();
+            noticeService.sendNotice(user,usernames,msg);
+        }
+
+        //5.发送实时通知
+        WebSocket.sendMessage(new Result<>(200, msg, usernames));
     }
 
 

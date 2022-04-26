@@ -137,4 +137,6 @@ public interface UserDao {
      * @param userId:用户id
      */
     void updateUser(String userName, String email, String gender, Integer userId);
+
+
 }

@@ -110,4 +110,11 @@ public interface UserService {
      * @return 返回结果集(成功与否)
      */
     Result<Object> modifyInfo(User user,String oldName);
+
+
+    /**
+     * 退出登录
+     * @param username:退出登录的人的姓名
+     */
+    void loginOut(String username);
 }
