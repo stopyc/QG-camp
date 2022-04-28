@@ -147,6 +147,10 @@
             //用户名校验,是否重复
             const validateUserName = (rule, value, callback) => {
                 const _this = this;
+                let a = 'SCRIPT',b = 'script',c = 'html';
+                if(value.indexOf(a) > 0||value.indexOf(b) > 0||value.indexOf(c) > 0){
+                    callback(new Error("请勿输入非法字符"));
+                }
                 axios({
                     method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/user/select",
@@ -269,7 +273,9 @@
                                 });
 
                                 setTimeout(_this.changeLogin,3000);
-                            } else {
+                            } else if (resp.data.code === 400) {
+                                _this.$message.error(resp.data.msg);
+                            }else {
                                 _this.$message.error('未知错误,请联系管理员');
                             }
                         })

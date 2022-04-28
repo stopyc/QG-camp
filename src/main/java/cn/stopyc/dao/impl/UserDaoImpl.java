@@ -124,4 +124,9 @@ public class UserDaoImpl implements UserDao {
         CRUDUtils.update(sql,userName,email,gender,userId);
     }
 
+    @Override
+    public List<User> getUsersByUserIds(String sql) {
+        return CRUDUtils.query(sql,new BeanListHandle<>(User.class));
+    }
+
 }

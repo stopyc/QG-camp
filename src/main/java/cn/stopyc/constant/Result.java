@@ -7,14 +7,20 @@ package cn.stopyc.constant;
  * @create: 2022-04-01 12:24
  **/
 public class Result<T> {
-    //编号
+    /**
+     * 编号
+     */
     private Integer code;
-    //信息
+    /**
+     * 信息
+     */
     private String msg;
 
-    //数据
+    /**
+     * 数据
+     */
     private T data;
-    //
+
 
     public Result(String msg) {
         this.msg = msg;

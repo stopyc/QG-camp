@@ -37,8 +37,11 @@ public class TaskServiceImpl implements TaskService {
         //1.获取dao
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
 
+        System.out.println("id "+idByName);
         //2.通过用户id获取任务对象
         Task task = taskDao.getTaskByUserId(idByName);
+
+        System.out.println("task"+task);
 
         //3.找不到任务,那就没有任务
         if (task == null) {
@@ -255,7 +258,7 @@ public class TaskServiceImpl implements TaskService {
         taskDao.modifyTask(task.getTaskName(),task.getLevel(),task.getDeadline(),taskId);
 
         //5.发送消息
-        sendNotice(userByTaskId.getUserName() + "已上线", userByTaskId);
+        sendNotice(userByTaskId.getUserName() + "的任务被修改", userByTaskId);
 
         //6.返回结果集
         return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
@@ -287,13 +290,16 @@ public class TaskServiceImpl implements TaskService {
             usernames.add(u.getUserName());
         }
 
-        //4.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
-        if (!msg.contains("上线") || msg.contains("离线")) {
+        //4.包括自己
+        usernames.add(user.getUserName());
+
+        //5.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
+        if (!msg.contains("上线") || msg.contains("下线")) {
             NoticeService noticeService = SingletonFactory.getNoticeServiceSingleton();
             noticeService.sendNotice(user,usernames,msg);
         }
 
-        //5.发送实时通知
+        //6.发送实时通知
         WebSocket.sendMessage(new Result<>(200, msg, usernames));
     }
 

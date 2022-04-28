@@ -1,7 +1,5 @@
 package cn.stopyc.bean;
 
-import cn.stopyc.dao.NoticeDao;
-import cn.stopyc.dao.TaskDao;
 import cn.stopyc.dao.impl.NoticeDaoImpl;
 import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.dao.impl.UserDaoImpl;

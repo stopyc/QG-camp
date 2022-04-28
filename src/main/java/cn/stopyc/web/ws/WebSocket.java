@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @program: tomcat-demo01
+ * @program: qg-engineering-management-system
  * @description:
  * @author: stop.yc
  * @create: 2022-04-24 23:36
@@ -25,13 +25,12 @@ public class WebSocket {
     /**
      * map集合,key是登录用户,value是建立的websocket
      */
-    private static Map<String , WebSocket> clients = new ConcurrentHashMap<String , WebSocket>();
+    private static Map<String , WebSocket> clients = new ConcurrentHashMap<>();
 
     /**
      * websocket建立时带的session
      */
     private Session session;
-
 
     /**
      * request的session,用户获取session中的value
@@ -43,7 +42,6 @@ public class WebSocket {
 
         //1.记录保存当前的ws的session
         this.session = session;
-
 
         //3.通过配置config获取httpsession
         HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
@@ -63,15 +61,12 @@ public class WebSocket {
         //1.获取httpsession域中存放的username对应的值
         String username = (String) httpSession.getAttribute("username");
 
-
         //2.下线,
         clients.remove(username);
 
         //3.销毁session
         httpSession.removeAttribute(username);
 
-        //4...提示
-        System.out.println("关闭");
     }
 
     @OnMessage
@@ -79,8 +74,6 @@ public class WebSocket {
         //客户端发送的信息
         System.out.println("客户端发送的给后台消息:" + message);
 
-        //获取前端传进来的信息,并发送给对应用户
-//        WebSocket.sendMessage(message);
     }
 
     @OnError
@@ -88,31 +81,6 @@ public class WebSocket {
         //开启ws错误
         System.out.println("错误!");
     }
-
-//    /**
-//     * 这个是处理消息的,可以封装成json的,可以通过名字,获取要发送给谁.
-//     * @param message:消息
-//     */
-//    public static void sendMessage(String message) {
-//
-//        // 向所有连接websocket的客户端发送消息
-//        // 也可以修改为对某个客户端发消息,通过msg中的值进行判断
-//        System.out.println(clients.size());
-//        for (WebSocket item : clients.values()) {
-//            System.out.println(message);
-////            item.session.getAsyncRemote().sendText(message);
-//            try {
-//                item.session.getBasicRemote().sendText(message);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        if (clients.size() > 0 ) {
-//            for (String s : clients.keySet()) {
-//                System.out.println(s);
-//            }
-//        }
-//    }
 
     /**
      * 这个是处理消息的,可以封装成json的,可以通过名字,获取要发送给谁.

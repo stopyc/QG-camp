@@ -66,12 +66,12 @@
                 </el-form-item>
 
                 <el-form-item label="用户名:" prop="username">
-                    <el-input v-model="user.username" style="width: 300px;"
+                    <el-input v-model.trim="user.username" style="width: 300px;"
                               :plain="true"  autocomplete="off"></el-input>
                 </el-form-item>
 
                 <el-form-item label="密码" prop="password">
-                    <el-input type="password" v-model="user.password" autocomplete="off"
+                    <el-input type="password" v-model.trim="user.password" autocomplete="off"
                               style="width: 300px;"></el-input>
                 </el-form-item>
 
@@ -119,6 +119,10 @@
         data() {
             const validateUserName = (rule, value, callback) => {
                 const _this = this;
+                 let a = 'SCRIPT',b = 'script',c = 'html';
+                if(value.indexOf(a) > 0||value.indexOf(b) > 0||value.indexOf(c) > 0){
+                    callback(new Error("请勿输入非法字符"));
+                }
                 axios({
                     method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/user/select",
@@ -155,7 +159,6 @@
                         {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
                     ],
                 },
-
             }
         },
 
@@ -182,6 +185,8 @@
                                 setTimeout(_this.changeMain,2000);
 
                             } else if (resp.data.code === 500200) {
+                                _this.$message.error(resp.data.msg);
+                            }else if (resp.data.code === 400) {
                                 _this.$message.error(resp.data.msg);
                             } else {
                                 _this.$message.error('未知错误,请联系管理员');

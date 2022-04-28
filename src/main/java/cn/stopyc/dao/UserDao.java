@@ -139,4 +139,10 @@ public interface UserDao {
     void updateUser(String userName, String email, String gender, Integer userId);
 
 
+    /**
+     * 通过用户id集合获取用户集合
+     * @param sql:sql
+     * @return: 返回用户集合
+     */
+    List<User> getUsersByUserIds(String sql);
 }

@@ -1,6 +1,5 @@
 package cn.stopyc.service;
 
-import cn.stopyc.bean.MyTeam;
 import cn.stopyc.constant.Result;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
@@ -19,8 +18,8 @@ public interface TaskService {
 
     /**
      * 通过用户id获取任务
-      * @param idByName
-     * @return
+      * @param idByName:用户id
+     * @return: 返回任务集合
      */
     Result<List<Task>> getTaskByUserId(Integer idByName);
 
@@ -28,31 +27,31 @@ public interface TaskService {
     /**
      * 通过用户id获取所属任务完成信息
      * @param userId:用户id
-     * @return
+     * @return: 返回结果集(成功与否
      */
-    Result getTaskCompleteByUserId(Integer userId);
+    Result<Object> getTaskCompleteByUserId(Integer userId);
 
 
     /**
      * 点击任务完成按钮
      * @param taskId:任务id
-     * @return
+     * @return: 返回结果集(成功与否
      */
-    Result ok(String taskId);
+    Result<Object> ok(String taskId);
 
     /**
      * 添加任务信息
      * @param task:任务
      * @param userId:用户id
-     * @return
+     * @return: 返回结果集(成功与否
      */
-    Result add(Task task,int userId);
+    Result<Object> add(Task task,int userId);
 
 
     /**
      * 通过用户集合,获取任务集合
      * @param users:用户集合
-     * @return
+     * @return: 返回任务集合
      */
     List<Task> getTasksByUsers(List<User> users);
 

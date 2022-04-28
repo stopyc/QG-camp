@@ -35,6 +35,7 @@ public class CRUDUtils {
             ps = con.prepareStatement(sql);
             //  params.length 获取可变长度的长度
             for (int i = 0; i < params.length; i++) {
+
                 ps.setObject(i + 1,params[i]);
             }
             System.out.println(ps);

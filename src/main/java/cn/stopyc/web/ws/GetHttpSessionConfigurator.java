@@ -7,13 +7,15 @@ import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 /**
- * @program: tomcat-demo01
+ * @program: qg-engineering-management-system
  * @description: 获取session
  * @author: stop.yc
  * @create: 2022-04-25 19:28
  **/
 public class GetHttpSessionConfigurator extends Configurator {
-
+    /**
+     * 重写修改握手方法
+     */
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
         HttpSession httpSession = (HttpSession) request.getHttpSession();

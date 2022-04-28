@@ -5,8 +5,6 @@ import cn.stopyc.bean.QueryUser;
 import cn.stopyc.constant.Result;
 import cn.stopyc.po.User;
 
-import java.util.List;
-
 /**
 * @Description: 用户service层
 * @Param:
@@ -39,7 +37,7 @@ public interface UserService {
      * @param checkCodeGen:生成的
      * @return 返回结果集(成功与否)
      */
-    Result checkCheckCode(String checkCode,String checkCodeGen);
+    Result<Object> checkCheckCode(String checkCode,String checkCodeGen);
 
 
     /**
@@ -79,6 +77,7 @@ public interface UserService {
     /**
      * 查询下级用户
      * @param queryUser:封装查询对象
+     * @param sort:排序方式
      * @return 返回结果集(查询用户)
      */
     Result<QueryUser> queryUser(User queryUser, Integer sort);
@@ -90,7 +89,7 @@ public interface UserService {
      * @param bossName:上级id
      * @return 返回结果集(成功与否)
      */
-    Result inTeam(Integer inTeamUserId, String bossName);
+    Result<Object> inTeam(Integer inTeamUserId, String bossName);
 
 
     /**
@@ -100,7 +99,7 @@ public interface UserService {
      * @param username:用户姓名
      * @return 返回结果集(成功与否)
      */
-    Result changePassword(String oldPassword, String newPassword,String username);
+    Result<Object> changePassword(String oldPassword, String newPassword,String username);
 
 
     /**

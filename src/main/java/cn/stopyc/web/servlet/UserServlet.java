@@ -3,26 +3,17 @@ package cn.stopyc.web.servlet;
 import cn.stopyc.bean.MyTeam;
 import cn.stopyc.bean.QueryUser;
 import cn.stopyc.bean.SingletonFactory;
-
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
-import cn.stopyc.constant.SessionConstant;
-import cn.stopyc.dao.TaskDao;
-import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.TaskService;
 import cn.stopyc.service.UserService;
-import cn.stopyc.service.impl.TaskServiceImpl;
-import cn.stopyc.service.impl.UserServiceImpl;
-import cn.stopyc.util.CheckCodeUtil;
+import cn.stopyc.util.CheckUtil;
 import cn.stopyc.util.JsonUtil;
 import cn.stopyc.util.Md5Utils;
 import cn.stopyc.util.StringUtil;
-import cn.stopyc.web.ws.WebSocket;
 import com.alibaba.fastjson.JSON;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,11 +21,9 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * @program: qg-baseservlet-demo
+ * @program: qg-engineering-management-system
  * @description:
  * @author: stop.yc
  * @create: 2022-04-13 15:42
@@ -53,17 +42,21 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/13
     */
-    public void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void login(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 
-//        System.out.println("我是login");
-
-//        resp.setContentType("text/json;charset=utf-8");
 
         //1.获取前端数据(post)请求体
+
         BufferedReader reader = req.getReader();
         String userStr = reader.readLine();
         User user = JSON.parseObject(userStr, User.class);
+
+        //补充校验
+        if (!(CheckUtil.checkName(user.getUserName()) && CheckUtil.checkPassword(user.getPassword()))) {
+            JsonUtil.toJson(new Result<>(ResultEnum.PARAMETER_NOT_VALID.getCode(), ResultEnum.PARAMETER_NOT_VALID.getMsg()),resp);
+            return;
+        }
 
         //2.删掉用户可能输入的两端空格,以及用户信息加密
         user.setUserName(StringUtil.getTrimStr(user.getUserName()));
@@ -73,62 +66,39 @@ public class UserServlet extends BaseServlet{
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
         //4.调用service层的登录功能,获取处理结果集(通过名字和密码进行登录)
-        Result<Integer> userResult = userService.login(user.getUserName(), user.getPassword());
+        Result<Integer> userResult = userService.login(CheckUtil.XssAndHtml(user.getUserName()), user.getPassword());
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
         HttpSession session = req.getSession();
 
         //6.设置sessionUserName
-        session.setAttribute("username",user.getUserName());
+        session.setAttribute("username",CheckUtil.XssAndHtml(user.getUserName()));
         JsonUtil.toJson(userResult,resp);
     }
 
 
 
-    public void register(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        //获取用户名,密码,验证码
+    public void register(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+         //获取用户名,密码,邮箱
 
         //1.获取前端数据(post)请求体
         BufferedReader reader = req.getReader();
         String userStr = reader.readLine();
 
-        System.out.println("userStr = " + userStr);
         User user = JSON.parseObject(userStr, User.class);
-//
+
+        //补充校验
+        if (!(CheckUtil.checkName(user.getUserName()) && CheckUtil.checkPassword(user.getPassword()) && CheckUtil.checkEmail(user.getEmail()))) {
+            JsonUtil.toJson(new Result<>(ResultEnum.PARAMETER_NOT_VALID.getCode(), ResultEnum.PARAMETER_NOT_VALID.getMsg()),resp);
+            return;
+        }
+
         UserService userService = SingletonFactory.getUserServiceSingleton();
-        Result<User> registerResult = userService.register(StringUtil.getTrimStr(user.getUserName()), Md5Utils.getMD5(user.getPassword()),user.getEmail(),user.getPosition());
+        Result<User> registerResult = userService.register(CheckUtil.XssAndHtml(StringUtil.getTrimStr(user.getUserName())), Md5Utils.getMD5(user.getPassword()),user.getEmail(),user.getPosition());
 
         //5.封装结果集成json对象,返回前端,前端通过code,判断注册情况
         JsonUtil.toJson(registerResult,resp);
     }
-
-    public void checkCode(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-
-        //1.获取前端数据(post)请求体
-        BufferedReader reader = request.getReader();
-        String checkCode = reader.readLine();
-
-        //字节输出流,响应到页面
-        ServletOutputStream os = response.getOutputStream();
-
-        //生成验证码图片和信息
-        String checkCodeGen = CheckCodeUtil.outputVerifyImage(100, 50, os, 4);
-
-//        //3.获取service对象
-//        UserService userService = SingletonFactory.getUserServiceSingleton();
-//
-//        //4.调用service层的登录功能,获取处理结果集(通过名字和密码进行登录)
-//        Result checkResult = userService.checkCheckCode(checkCode,checkCodeGen);
-//
-//        //5.封装结果集成json对象,返回前端,前端通过code,判断登录情况,重定向
-//        try {
-//            JsonUtil.toJson(checkResult,response);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-    }
-
 
 
     /**
@@ -138,7 +108,7 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/16
     */
-    public void select(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void select(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         //1.获取前端数据(post)
         BufferedReader reader = req.getReader();
         String userStr = reader.readLine();
@@ -160,7 +130,7 @@ public class UserServlet extends BaseServlet{
      * @Author: stop.yc
      * @Date: 2022/4/19
      */
-    public void selectMyTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void selectMyTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 
         //1.获取前端数据
@@ -187,7 +157,7 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/21
     */
-    public void kickMember(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void kickMember(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         //1.获取前端数据
         BufferedReader reader = req.getReader();
@@ -207,7 +177,7 @@ public class UserServlet extends BaseServlet{
             taskService.deleteTask(Integer.parseInt(split[1]));
         }
 
-        Result result = new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+        Result<Object> result = new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
 
         JsonUtil.toJson(result,resp);
     }
@@ -220,7 +190,7 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/21
     */
-    public void selectSon(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void selectSon(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         //1.获取前端数据(第一个是用户姓名,第二个是职位标志)
         BufferedReader reader = req.getReader();
@@ -249,7 +219,7 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/22
     */
-    public void inTeam(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void inTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         //1.获取前端数据(要进队的用户id)
         BufferedReader reader = req.getReader();
@@ -263,7 +233,7 @@ public class UserServlet extends BaseServlet{
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
         //4.获取结果集
-        Result result = userService.inTeam(Integer.parseInt(inTeamUserId),bossName);
+        Result<Object> result = userService.inTeam(Integer.parseInt(inTeamUserId),bossName);
 
         //5.返回前端
         JsonUtil.toJson(result,resp);
@@ -276,16 +246,16 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/23
     */
-    public void getSession(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void getSession(HttpServletRequest req, HttpServletResponse resp) {
 
         HttpSession session = req.getSession();
         String username = (String) session.getAttribute("username");
-        System.out.println("username" + username);
+
         UserService userService = SingletonFactory.getUserServiceSingleton();
         Result<User> select = userService.select(username);
         select.getData().setPassword("");
 
-        Result result = new Result(200,username,select.getData());
+        Result<Object> result = new Result<>(200,username,select.getData());
 
         JsonUtil.toJson(result,resp);
     }
@@ -297,12 +267,11 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/23
     */
-    public void loginOut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void loginOut(HttpServletRequest req, HttpServletResponse resp) {
 
         //1.获取谁退出登录
         HttpSession session = req.getSession();
         String username = (String) session.getAttribute("username");
-//        session.removeAttribute("username");
 
         //2.获取service
         UserService userService = SingletonFactory.getUserServiceSingleton();
@@ -317,11 +286,16 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/24
     */
-    public void changePassword(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void changePassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         //1.获取前端数据(第一个是老密码,第二个是新密码),因为不存在中文,所以不需要转码
         BufferedReader reader = req.getReader();
         String queryUserStr = reader.readLine();
         String[] split = queryUserStr.split("&");
+
+        //补充校验
+        if (!(CheckUtil.checkPassword(split[0]) && CheckUtil.checkPassword(split[1]) )) {
+            JsonUtil.toJson(new Result<>(ResultEnum.PARAMETER_NOT_VALID.getCode(), ResultEnum.PARAMETER_NOT_VALID.getMsg()),resp);return;
+        }
 
         //2.获取修改的用户的名字
         HttpSession session = req.getSession();
@@ -331,7 +305,7 @@ public class UserServlet extends BaseServlet{
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
         //4.调用业务改变密码,获取结果集
-        Result result = userService.changePassword(split[0],split[1],username);
+        Result<Object> result = userService.changePassword(split[0],split[1],username);
 
         //5.返回结果集
         JsonUtil.toJson(result,resp);
@@ -344,7 +318,7 @@ public class UserServlet extends BaseServlet{
     * @Author: stop.yc
     * @Date: 2022/4/24
     */
-    public void modifyInfo(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void modifyInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         //1.获取前端数据(post),第一个是修改后的条件对象,第二个是原来的用户
         BufferedReader reader = req.getReader();
@@ -354,8 +328,14 @@ public class UserServlet extends BaseServlet{
 
 
         User user = JSON.parseObject(split[0], User.class);
-        System.out.println("user = "+ user);
-        System.out.println("username" + split[1]);
+
+        //补充校验
+        if (!(CheckUtil.checkName(user.getUserName()) && CheckUtil.checkEmail(user.getEmail()))) {
+            JsonUtil.toJson(new Result<>(ResultEnum.PARAMETER_NOT_VALID.getCode(), ResultEnum.PARAMETER_NOT_VALID.getMsg()),resp);
+            return;
+        }
+
+        user.setUserName(CheckUtil.XssAndHtml(user.getUserName()));
 
         //2.获取service
         UserService userService = SingletonFactory.getUserServiceSingleton();

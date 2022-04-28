@@ -1,7 +1,5 @@
 package cn.stopyc.bean;
 
-import org.omg.CORBA.INTERNAL;
-
 import java.util.Date;
 
 /**

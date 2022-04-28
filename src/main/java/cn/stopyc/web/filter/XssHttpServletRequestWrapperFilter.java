@@ -1,6 +1,5 @@
-package cn.stopyc.bean;
+package cn.stopyc.web.filter;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.text.CharacterIterator;
@@ -20,6 +19,7 @@ public class XssHttpServletRequestWrapperFilter extends HttpServletRequestWrappe
         super(request);
         orgRequest = request;
     }
+
     @Override
     public String getParameter(String name) {
         String value = super.getParameter(xssEncode(name));

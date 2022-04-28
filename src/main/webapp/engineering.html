@@ -25,9 +25,17 @@
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
         <el-menu :default-openeds="['1', '3']">
 
-            <el-menu-item index="1">工程队</el-menu-item>
-            <el-button @click="personInfo" target="_blank">个人信息</el-button>
-            <el-menu-item index="3">消息通知</el-menu-item>
+            <el-menu-item index="1">
+                <el-button @click="teamButton" target="_blank">工程队</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="2">
+                <el-button @click="personInfo" target="_blank">个人信息</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="3">
+                <el-button @click="noticeButton" target="_blank">消息通知</el-button>
+            </el-menu-item>
         </el-menu>
     </el-aside>
 
@@ -88,7 +96,7 @@
                     <el-table-column
                             prop="allTaskCount"
                             align="center"
-                            label="完成/总数"
+                            label="完成/子任务总数"
                     >
                     </el-table-column>
 
@@ -205,7 +213,7 @@
         <el-dialog title="修改任务" :visible.sync="teamModifyFormVisible">
             <el-form ref="modifyTask" :model="modifyTask" label-width="80px" :rules="rules">
                 <el-form-item label="任务名称" prop="taskName">
-                    <el-input v-model="modifyTask.taskName" autocomplete="off"></el-input>
+                    <el-input v-model.trim="modifyTask.taskName" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="任务难度" prop="level">
                     <template>
@@ -299,7 +307,7 @@
         <el-dialog title="添加任务" :visible.sync="teamAddFormVisible">
             <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
                 <el-form-item label="任务名称" prop="taskName">
-                    <el-input v-model="addTask.taskName" autocomplete="off"></el-input>
+                    <el-input v-model.trim="addTask.taskName" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="任务难度" prop="level">
                     <template>
@@ -325,7 +333,7 @@
         <el-form :inline="true" :model="queryUser" class="queryUser">
 
             <el-form-item label="包工头姓名">
-                <el-input v-model="queryUser.userName" placeholder="包工头姓名"></el-input>
+                <el-input v-model.trim="queryUser.userName" placeholder="包工头姓名"></el-input>
             </el-form-item>
 
             <el-form-item label="性别">
@@ -358,6 +366,7 @@
                 <el-button type="primary" @click="querySon">查询</el-button>
             </el-form-item>
         </el-form>
+
         <el-divider></el-divider>
 
         <!--        所有包工头信息展示-->
@@ -482,6 +491,15 @@
         },
         data() {
 
+            const validateUserName = (rule, value, callback) => {
+                const _this = this;
+                let a = 'SCRIPT',b = 'script',c = 'html';
+                if(value.indexOf(a) > 0||value.indexOf(b) > 0||value.indexOf(c) > 0){
+                    callback(new Error("请勿输入非法字符"));
+                }else{
+                    callback();
+                }
+            };
 
             //截止日期校验(不能晚于父级任务的时间,不能早于现在,总负责人就只有一个不能早于现在)
             const validateDeadline = (rule, value, callback) => {
@@ -554,6 +572,7 @@
                     taskName: [
                         {required: true, message: '请输入任务名称', trigger: 'blur'},
                         {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                        {validator: validateUserName, trigger: 'blur'}
                     ],
                     deadline: [
                         {required: true, message: '请输入截止日期', trigger: 'blur'},
@@ -777,7 +796,7 @@
                         data: row.userId,
                     }).then(function (resp) {
                         if (resp.data.code === 200) {
-                            setTimeout(_this.refresh, 100);
+                            setTimeout(_this.refresh, 500);
                         }
                     })
                 }).catch(() => {
@@ -791,6 +810,14 @@
             //个人信息跳转
             personInfo() {
                 window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
+            },
+
+            teamButton(){
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/engineering.html";
+            },
+
+            noticeButton(){
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/notice.html";
             },
 
 
@@ -844,7 +871,7 @@
                                 document.getElementById("teamAddButton").disabled = true;
                                 _this.teamAddFormVisible = false;
                                 _this.$message.success("任务添加成功");
-                                setTimeout(_this.refresh, 100);
+                                setTimeout(_this.refresh, 500);
                             }
                         })
                     } else {
@@ -872,6 +899,8 @@
                                 _this.teamModifyFormVisible = false;
                                 _this.$message.success("任务修改成功");
                                 setTimeout(_this.refresh, 500);
+                            }else if (resp.data.code === 400) {
+                                _this.$message.error(resp.data.msg);
                             }
                         })
                     } else {
@@ -969,7 +998,7 @@
                         data: row.userId + "&" + row.taskId,
                     }).then(function (resp) {
                         if (resp.data.code === 200) {
-                            setTimeout(_this.refresh, 100);
+                            setTimeout(_this.refresh, 500);
                         }
                     })
 
@@ -1019,7 +1048,9 @@
 
                                 _this.dialogFormVisible = false;
                                 _this.$message.success("任务添加成功");
-                                setTimeout(_this.refresh, 100);
+                                setTimeout(_this.refresh, 500);
+                            }else if (resp.data.code === 400) {
+                                _this.$message.error(resp.data.msg);
                             }
                         })
                     } else {
@@ -1075,7 +1106,7 @@
                     if (resp.data.code === 200) {
                         _this.$message.success("恭喜你,任务已完成");
                         _this.myTaskTableData[0].taskId = 0;
-                        setTimeout(_this.refresh, 100);
+                        setTimeout(_this.refresh, 500);
 
                     } else if (resp.data.code === 600210) {
                         _this.$message.error(resp.data.msg);
@@ -1181,9 +1212,10 @@
                 //session存了当前登录者的姓名
                 const _this = this;
                 axios({
-                    method: "get",
+                    method: "post",
                     url: "http://localhost:8080/qg-engineering-management-system/task/selectMyTask"
                 }).then(function (resp) {
+                    console.log("11111111111111"+resp.data.data);
                     if (resp.data.code === 200) {
                         _this.myTaskTableData = resp.data.data;
                         //时间转换

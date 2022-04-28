@@ -1,5 +1,12 @@
 package cn.stopyc.constant;
 
+/**
+* @Description: 结果集枚举
+* @Param:
+* @return:
+* @Author: stop.yc
+* @Date: 2022/4/28
+*/
 public enum ResultEnum {
     //自定义
     //通用
@@ -22,12 +29,18 @@ public enum ResultEnum {
     NO_TEAM(700200,"队伍中无成员"),
     //查询模块 8002XX
     NOT_FOUND(800200,"查无该条件用户"),
+    //通知模块 9002XX
+    NO_NOTICE(900200,"无任务")
 
 
     ;
-    //编号
+    /**
+     * 编号
+     */
     private Integer code;
-    //信息
+    /**
+     * 信息
+     */
     private String msg;
 
     ResultEnum(Integer code, String msg) {

@@ -18,242 +18,151 @@
 </head>
 <body>
 
-<!--侧边-->
-<el-container style="height: 800px; border: 1px solid #eee" id="chiefPeople">
-    <!--            三个边栏-->
-    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-        <el-menu :default-openeds="['1', '3']">
+    <!--侧边-->
+    <el-container style="height: 800px; border: 1px solid #eee" id="chiefPeople">
+        <!--            三个边栏-->
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+            <el-menu :default-openeds="['1', '3']">
 
-            <el-menu-item index="1">
-                <el-button @click="teamButton" target="_blank">管理团队</el-button>
-            </el-menu-item>
+                <el-menu-item index="1">
+                    <el-button @click="teamButton" target="_blank">管理团队</el-button>
+                </el-menu-item>
 
-            <el-menu-item index="2">
-                <el-button @click="personInfo" target="_blank">个人信息</el-button>
-            </el-menu-item>
+                <el-menu-item index="2">
+                    <el-button @click="personInfo" target="_blank">个人信息</el-button>
+                </el-menu-item>
 
-            <el-menu-item index="3">
-                <el-button @click="noticeButton" target="_blank">消息通知</el-button>
-            </el-menu-item>
-        </el-menu>
-    </el-aside>
+                <el-menu-item index="3">
+                    <el-button @click="noticeButton" target="_blank">消息通知</el-button>
+                </el-menu-item>
+            </el-menu>
+        </el-aside>
 
-    <!--    内容-->
-    <el-container>
-        <!--        页头-->
-        <el-header style="text-align: right; font-size: 12px">
-            <el-dropdown>
-                <i class="el-icon-setting" style="margin-right: 15px"></i>
-                <el-dropdown-menu slot="dropdown">
-                    <el-button type="text" @click="loginOut">退出登录</el-button>
-                </el-dropdown-menu>
-            </el-dropdown>
-            <el-tag v-model="username">{{username}}</el-tag>
-        </el-header>
+        <!--    内容-->
+        <el-container>
+            <!--        页头-->
+            <el-header style="text-align: right; font-size: 12px">
+                <el-dropdown>
+                    <i class="el-icon-setting" style="margin-right: 15px"></i>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-button type="text" @click="loginOut">退出登录</el-button>
+                    </el-dropdown-menu>
+                </el-dropdown>
+                <el-tag v-model="username">{{username}}</el-tag>
+            </el-header>
 
-        <!--        我的任务列表-->
-        <el-form :inline="true" :model="myTaskTableData" class="myTaskTableData">
-            <template>
+            <!--        我的任务列表-->
+            <el-form :inline="true" :model="myTaskTableData" class="myTaskTableData">
+                <template>
 
-                <el-table
-                        ref="singleTable"
-                        :data="myTaskTableData"
-                        style="width: 100%"
-                        :row-class-name="tableRowClassName"
-                        @selection-change="handleSelectionChange"
-                        highlight-current-row
-                        @current-change="handleCurrentChange"
-                >
-
-                    <el-table-column
-                            type="index"
-                            width="50">
-                    </el-table-column>
-
-                    <el-table-column
-                            prop="taskName"
-                            label="任务名称"
-                            align="center"
+                    <el-table
+                            ref="singleTable"
+                            :data="myTaskTableData"
+                            style="width: 100%"
+                            :row-class-name="tableRowClassName"
+                            @selection-change="handleSelectionChange"
+                            highlight-current-row
+                            @current-change="handleCurrentChange"
                     >
-                    </el-table-column>
 
-                    <el-table-column
-                            prop="level"
-                            label="难度"
-                            align="center"
-                            :formatter="levelFormatter1"
-                    >
-                    </el-table-column>
+                        <el-table-column
+                                type="index"
+                                width="50">
+                        </el-table-column>
 
-                    <el-table-column
-                            prop="deadline"
-                            align="center"
-                            label="截止日期"
-                    >
-                    </el-table-column>
+                        <el-table-column
+                                prop="taskName"
+                                label="任务名称"
+                                align="center"
+                        >
+                        </el-table-column>
 
-                    <el-table-column
-                            prop="allTaskCount"
-                            align="center"
-                            label="完成/总数"
-                    >
-                    </el-table-column>
+                        <el-table-column
+                                prop="level"
+                                label="难度"
+                                align="center"
+                                :formatter="levelFormatter1"
+                        >
+                        </el-table-column>
+
+                        <el-table-column
+                                prop="deadline"
+                                align="center"
+                                label="截止日期"
+                        >
+                        </el-table-column>
+
+                        <el-table-column
+                                prop="allTaskCount"
+                                align="center"
+                                label="完成/总数"
+                        >
+                        </el-table-column>
 
 
-                    <el-table-column
-                            prop="status"
-                            align="center"
-                            label="当前状态"
-                            :formatter="statusFormatter1"
-                    >
-                    </el-table-column>
+                        <el-table-column
+                                prop="status"
+                                align="center"
+                                label="当前状态"
+                                :formatter="statusFormatter1"
+                        >
+                        </el-table-column>
 
-                    <el-table-column
-                            align="center"
-                            label="操作">
-                        <el-row>
+                        <el-table-column
+                                align="center"
+                                label="操作">
+                            <el-row>
 
-                            <el-button type="primary" @click="ok(myTaskTableData[0])" :plain="true">完成</el-button>
-                            <el-button type="success" @click="add(myTaskTableData[0])" :plain="true">添加</el-button>
-                        </el-row>
+                                <el-button type="primary" @click="ok(myTaskTableData[0])" :plain="true">完成</el-button>
+                                <el-button type="success" @click="add(myTaskTableData[0])" :plain="true">添加</el-button>
+                            </el-row>
 
-                    </el-table-column>
+                        </el-table-column>
 
-                </el-table>
-            </template>
-        </el-form>
-
-        <!--        添加任务的对话框-->
-        <el-dialog title="添加任务" :visible.sync="dialogFormVisible">
-            <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
-                <el-form-item label="任务名称" prop="taskName">
-                    <el-input v-model="addTask.taskName" autocomplete="off"></el-input>
-                </el-form-item>
-
-                <el-form-item label="任务难度" prop="level">
-                    <template>
-                        <el-radio v-model="addTask.level" label="0">简单</el-radio>
-                        <el-radio v-model="addTask.level" label="1">困难</el-radio>
-                    </template>
-                </el-form-item>
-                <el-form-item label="截止时间" prop="deadline">
-                    <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="addTask.deadline"
-                                        style="width: 100%;" autocomplete="off"></el-date-picker>
-                    </el-col>
-                    <el-col class="line" :span="2">-</el-col>
-
-                </el-form-item>
-                <el-button id="addButton" type="primary" @click="addSubmit('addTask')" :loading="false">添加</el-button>
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                </el-form-item>
+                    </el-table>
+                </template>
             </el-form>
-        </el-dialog>
-        <el-divider></el-divider>
 
-        <!--我的队伍-->
-        <template>
-            <el-table
-                    :data="teamTableData"
-                    style="width: 100%"
-                    height="250">
+            <!--        添加任务的对话框-->
+            <el-dialog title="添加任务" :visible.sync="dialogFormVisible">
+                <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
+                    <el-form-item label="任务名称" prop="taskName">
+                        <el-input v-model.trim="addTask.taskName" autocomplete="off"></el-input>
+                    </el-form-item>
 
-                <el-table-column
-                        label="我的成员(项目经理)"
-                        width="180">
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
-                    </template>
-                </el-table-column>
+                    <el-form-item label="任务难度" prop="level">
+                        <template>
+                            <el-radio v-model="addTask.level" label="0">简单</el-radio>
+                            <el-radio v-model="addTask.level" label="1">困难</el-radio>
+                        </template>
+                    </el-form-item>
+                    <el-form-item label="截止时间" prop="deadline">
+                        <el-col :span="11">
+                            <el-date-picker type="date" placeholder="选择日期" v-model="addTask.deadline"
+                                            style="width: 100%;" autocomplete="off"></el-date-picker>
+                        </el-col>
+                        <el-col class="line" :span="2">-</el-col>
 
-                <el-table-column
-                        label="任务"
-                        width="200">
-                    <template slot-scope="scope">
-                        <div slot="reference" class="taskName">
-                            <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
-                        </div>
-                    </template>
-                </el-table-column>
+                    </el-form-item>
+                    <el-button id="addButton" type="primary" @click="addSubmit('addTask')" :loading="false">添加
+                    </el-button>
+                    <el-button @click="dialogFormVisible = false">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-dialog>
 
-                <el-table-column
-                        label="难度"
-                        width="180"
-                        :formatter="levelFormatter"
-                >
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
-                    </template>
-                </el-table-column>
+            <!--        分割线-->
+            <el-divider></el-divider>
 
-                <el-table-column
-                        label="截止日期"
-                        width="200">
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column
-                        label="当前状态"
-                        width="180"
-                        :formatter="statusFormatter"
-                >
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
-                    </template>
-                </el-table-column>
-
-
-                <el-table-column label="操作">
-                    <template slot-scope="scope">
-                        <el-button
-                                size="mini"
-                                @click="handleAdd(scope.$index, scope.row)"
-                        >添加任务
-                        </el-button>
-
-                        <el-button
-                                size="mini"
-                                @click="handleQuery(scope.$index, scope.row)"
-                        >查看
-                        </el-button>
-
-
-                        <el-button
-                                size="mini"
-                                type="danger"
-                                @click="MyHandleDelete(scope.$index, scope.row)"
-                        >踢出
-                        </el-button>
-
-                        <el-button
-                                size="mini"
-                                @click="handleModify(scope.$index, scope.row)"
-                        >修改
-                        </el-button>
-
-                    </template>
-                </el-table-column>
-            </el-table>
-        </template>
-
-        <!--        总负责人点击查询后的对话框-->
-        <el-dialog :visible.sync=" engineeringTeamTableVisible" width="80%" :show-close="false"
-                   :close-on-click-modal="false">
-            <div slot="title" class="header-title">
-                <span style="font-size:18px;color:#333333;">工程队</span>
-                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;"
-                      @click="myCloseDialog">×</span>
-            </div>
-            <!--经理的工程队-->
+            <!--我的队伍-->
             <template>
                 <el-table
-                        :data="engineeringTeamTableData"
-                        style="width: 100%">
+                        :data="teamTableData"
+                        style="width: 100%"
+                        height="250">
 
                     <el-table-column
-                            label="成员(包工头)"
+                            label="我的成员(项目经理)"
                             width="180">
                         <template slot-scope="scope">
                             <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
@@ -301,11 +210,30 @@
 
                     <el-table-column label="操作">
                         <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    @click="handleAdd(scope.$index, scope.row)"
+                            >添加任务
+                            </el-button>
 
                             <el-button
                                     size="mini"
-                                    @click="handleQueryByForeman(scope.$index, scope.row)"
+                                    @click="handleQuery(scope.$index, scope.row)"
                             >查看
+                            </el-button>
+
+
+                            <el-button
+                                    size="mini"
+                                    type="danger"
+                                    @click="MyHandleDelete(scope.$index, scope.row)"
+                            >踢出
+                            </el-button>
+
+                            <el-button
+                                    size="mini"
+                                    @click="handleModify(scope.$index, scope.row)"
+                            >修改
                             </el-button>
 
                         </template>
@@ -313,248 +241,325 @@
                 </el-table>
             </template>
 
-        </el-dialog>
+            <!--        总负责人点击查询后的对话框-->
+            <el-dialog :visible.sync=" engineeringTeamTableVisible" width="80%" :show-close="false"
+                       :close-on-click-modal="false">
+                <div slot="title" class="header-title">
+                    <span style="font-size:18px;color:#333333;">工程队</span>
+                    <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;"
+                          @click="myCloseDialog">×</span>
+                </div>
+                <!--经理的工程队-->
+                <template>
+                    <el-table
+                            :data="engineeringTeamTableData"
+                            style="width: 100%">
 
-        <!--        包工头下的工程小组详情对话框-->
-        <el-dialog :visible.sync=" groupTableVisible" width="70%" :show-close="false" :close-on-click-modal="false">
-            <div slot="title" class="header-title">
-                <span style="font-size:18px;color:#333333;">工程小组</span>
-                <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;"
-                      @click="myCloseDialog1">×</span>
-            </div>
-            <!--包工头的工程小组-->
+                        <el-table-column
+                                label="成员(包工头)"
+                                width="180">
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="任务"
+                                width="200">
+                            <template slot-scope="scope">
+                                <div slot="reference" class="taskName">
+                                    <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
+                                </div>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="难度"
+                                width="180"
+                                :formatter="levelFormatter"
+                        >
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="截止日期"
+                                width="200">
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="当前状态"
+                                width="180"
+                                :formatter="statusFormatter"
+                        >
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
+                            </template>
+                        </el-table-column>
+
+
+                        <el-table-column label="操作">
+                            <template slot-scope="scope">
+
+                                <el-button
+                                        size="mini"
+                                        @click="handleQueryByForeman(scope.$index, scope.row)"
+                                >查看
+                                </el-button>
+
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </template>
+
+            </el-dialog>
+
+            <!--        包工头下的工程小组详情对话框-->
+            <el-dialog :visible.sync=" groupTableVisible" width="70%" :show-close="false" :close-on-click-modal="false">
+                <div slot="title" class="header-title">
+                    <span style="font-size:18px;color:#333333;">工程小组</span>
+                    <span style="float: right;font-size: 24px;padding: 0 10px;cursor: pointer;"
+                          @click="myCloseDialog1">×</span>
+                </div>
+                <!--包工头的工程小组-->
+                <template>
+                    <el-table
+                            :data="groupTableData"
+                            style="width: 100%">
+
+                        <el-table-column
+                                label="成员(小工)"
+                                width="180">
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="任务"
+                                width="200">
+                            <template slot-scope="scope">
+                                <div slot="reference" class="taskName">
+                                    <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
+                                </div>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="难度"
+                                width="180"
+                                :formatter="levelFormatter"
+                        >
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="截止日期"
+                                width="200">
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column
+                                label="当前状态"
+                                width="180"
+                                :formatter="statusFormatter"
+                        >
+                            <template slot-scope="scope">
+                                <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
+                            </template>
+                        </el-table-column>
+
+
+                    </el-table>
+                </template>
+
+            </el-dialog>
+
+            <!--        对我的成员添加任务的对话框-->
+            <el-dialog title="添加任务" :visible.sync="teamAddFormVisible">
+                <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
+                    <el-form-item label="任务名称" prop="taskName">
+                        <el-input v-model.trim="addTask.taskName" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="任务难度" prop="level">
+                        <template>
+                            <el-radio v-model="addTask.level" label="0">简单</el-radio>
+                            <el-radio v-model="addTask.level" label="1">困难</el-radio>
+                        </template>
+                    </el-form-item>
+                    <el-form-item label="截止时间" prop="deadline">
+                        <el-col :span="11">
+                            <el-date-picker type="date" placeholder="选择日期" v-model="addTask.deadline"
+                                            style="width: 100%;" autocomplete="off"></el-date-picker>
+                        </el-col>
+                        <el-col class="line" :span="2">-</el-col>
+
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button id="teamAddButton" type="primary" @click="teamAddTask('addTask')">添加</el-button>
+                        <el-button @click="teamAddFormVisible = false">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-dialog>
+
+            <!--        对我的成员修改任务的对话框-->
+            <el-dialog title="修改任务" :visible.sync="teamModifyFormVisible">
+                <el-form ref="modifyTask" :model="modifyTask" label-width="80px" :rules="rules">
+                    <el-form-item label="任务名称" prop="taskName">
+                        <el-input v-model.trim="modifyTask.taskName" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="任务难度" prop="level">
+                        <template>
+                            <el-radio v-model="modifyTask.level" label="0">简单</el-radio>
+                            <el-radio v-model="modifyTask.level" label="1">困难</el-radio>
+                        </template>
+                    </el-form-item>
+                    <el-form-item label="截止时间" prop="deadline">
+                        <el-col :span="11">
+                            <el-date-picker type="date" placeholder="选择日期" v-model="modifyTask.deadline"
+                                            style="width: 100%;" autocomplete="off"></el-date-picker>
+                        </el-col>
+                        <el-col class="line" :span="2">-</el-col>
+
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button id="teamModifyButton" type="primary" @click="teamModifyTask('modifyTask')">修改
+                        </el-button>
+                        <el-button @click="teamModifyFormVisible = false">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-dialog>
+
+            <!--        分割线-->
+            <el-divider></el-divider>
+
+            <!--所有经理的信息(查询框)-->
+            <el-form :inline="true" :model="queryUser" class="queryUser">
+
+                <el-form-item label="项目经理姓名">
+                    <el-input v-model.trim="queryUser.userName" placeholder="项目经理姓名"></el-input>
+                </el-form-item>
+
+                <el-form-item label="性别">
+                    <el-select v-model="queryUser.gender" placeholder="性别">
+                        <el-option label="男" value="1"></el-option>
+                        <el-option label="女" value="0"></el-option>
+                        <el-option label="所有" value="-1"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="排序">
+                    <el-select v-model="sort" placeholder="排序">
+                        <el-option label="姓名升序" value="1"></el-option>
+                        <el-option label="姓名降序" value="2"></el-option>
+                        <el-option label="入职时间升序" value="3"></el-option>
+                        <el-option label="入职时间降序" value="4"></el-option>
+                        <el-option label="综合排序" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="排序">
+                    <el-select v-model="queryUser.bossId" placeholder="无所属">
+                        <el-option label="有所属" value="1"></el-option>
+                        <el-option label="无所属" value="0"></el-option>
+                        <el-option label="所有" value="-1"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="querySon">查询</el-button>
+                </el-form-item>
+            </el-form>
+
+            <!--        所有经理信息展示-->
             <template>
                 <el-table
-                        :data="groupTableData"
-                        style="width: 100%">
+                        :data="allManager"
+                        style="width: 100%"
+                        height="250">
 
                     <el-table-column
-                            label="成员(小工)"
+                            type="index"
+                            width="50">
+                    </el-table-column>
+
+                    <el-table-column
+                            label="经理"
                             width="180">
                         <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{ scope.row.teamMemberName }}</span>
+                            <span style="margin-left: 10px">{{ scope.row.userName }}</span>
                         </template>
                     </el-table-column>
 
                     <el-table-column
-                            label="任务"
+                            label="性别"
+                            width="200"
+                            :formatter="genderFormatter">
+                        <template slot-scope="scope">
+                            <!--                        <el-tag size="medium">{{ scope.row.gender }}</el-tag>-->
+                            <span style="medium: 10px">{{genderFormatter(scope.row.gender) }}</span>
+
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="入职时间"
+                            width="180"
+                    >
+                        <template slot-scope="scope">
+                            <span style="margin-left: 10px">{{scope.row.hireDate }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column
+                            label="上级姓名"
                             width="200">
                         <template slot-scope="scope">
-                            <div slot="reference" class="taskName">
-                                <el-tag size="medium">{{ scope.row.taskName }}</el-tag>
+                            <div slot="reference" class="gender">
+                                <span style="margin-left: 10px">{{ scope.row.bossName }}</span>
                             </div>
                         </template>
                     </el-table-column>
 
                     <el-table-column
-                            label="难度"
+                            label="任务"
                             width="180"
-                            :formatter="levelFormatter"
                     >
                         <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{ levelFormatter(scope.row.level) }}</span>
+                            <span style="margin-left: 10px">{{scope.row.taskName}}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column
-                            label="截止日期"
-                            width="200">
+
+                    <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{ scope.row.deadline }}</span>
+                            <el-button
+                                    size="mini"
+                                    @click="handleInMyTeam(scope.$index, scope.row)"
+                            >进队
+                            </el-button>
+
+                            <!--                        <el-button-->
+                            <!--                                size="mini"-->
+                            <!--                                @click="handleQuery(scope.$index, scope.row)"-->
+                            <!--                        >查看-->
+                            <!--                        </el-button>-->
                         </template>
                     </el-table-column>
-
-                    <el-table-column
-                            label="当前状态"
-                            width="180"
-                            :formatter="statusFormatter"
-                    >
-                        <template slot-scope="scope">
-                            <span style="margin-left: 10px">{{statusFormatter(scope.row.status)}}</span>
-                        </template>
-                    </el-table-column>
-
-
                 </el-table>
             </template>
 
-        </el-dialog>
-
-        <!--        对我的成员添加任务的对话框-->
-        <el-dialog title="添加任务" :visible.sync="teamAddFormVisible">
-            <el-form ref="addTask" :model="addTask" label-width="80px" :rules="rules">
-                <el-form-item label="任务名称" prop="taskName">
-                    <el-input v-model="addTask.taskName" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="任务难度" prop="level">
-                    <template>
-                        <el-radio v-model="addTask.level" label="0">简单</el-radio>
-                        <el-radio v-model="addTask.level" label="1">困难</el-radio>
-                    </template>
-                </el-form-item>
-                <el-form-item label="截止时间" prop="deadline">
-                    <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="addTask.deadline"
-                                        style="width: 100%;" autocomplete="off"></el-date-picker>
-                    </el-col>
-                    <el-col class="line" :span="2">-</el-col>
-
-                </el-form-item>
-                <el-form-item>
-                    <el-button id="teamAddButton" type="primary" @click="teamAddTask('addTask')">添加</el-button>
-                    <el-button @click="teamAddFormVisible = false">取消</el-button>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
-
-        <!--        对我的成员修改任务的对话框-->
-        <el-dialog title="修改任务" :visible.sync="teamModifyFormVisible">
-            <el-form ref="modifyTask" :model="modifyTask" label-width="80px" :rules="rules">
-                <el-form-item label="任务名称" prop="taskName">
-                    <el-input v-model="modifyTask.taskName" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="任务难度" prop="level">
-                    <template>
-                        <el-radio v-model="modifyTask.level" label="0">简单</el-radio>
-                        <el-radio v-model="modifyTask.level" label="1">困难</el-radio>
-                    </template>
-                </el-form-item>
-                <el-form-item label="截止时间" prop="deadline">
-                    <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="modifyTask.deadline"
-                                        style="width: 100%;" autocomplete="off"></el-date-picker>
-                    </el-col>
-                    <el-col class="line" :span="2">-</el-col>
-
-                </el-form-item>
-                <el-form-item>
-                    <el-button id="teamModifyButton" type="primary" @click="teamModifyTask('modifyTask')">修改</el-button>
-                    <el-button @click="teamModifyFormVisible = false">取消</el-button>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
-        <el-divider></el-divider>
-
-        <!--所有经理的信息(查询框)-->
-        <el-form :inline="true" :model="queryUser" class="queryUser">
-
-            <el-form-item label="项目经理姓名">
-                <el-input v-model="queryUser.userName" placeholder="项目经理姓名"></el-input>
-            </el-form-item>
-
-            <el-form-item label="性别">
-                <el-select v-model="queryUser.gender" placeholder="性别">
-                    <el-option label="男" value="1"></el-option>
-                    <el-option label="女" value="0"></el-option>
-                    <el-option label="所有" value="-1"></el-option>
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="排序">
-                <el-select v-model="sort" placeholder="排序">
-                    <el-option label="姓名升序" value="1"></el-option>
-                    <el-option label="姓名降序" value="2"></el-option>
-                    <el-option label="入职时间升序" value="3"></el-option>
-                    <el-option label="入职时间降序" value="4"></el-option>
-                    <el-option label="综合排序" value="0"></el-option>
-                </el-select>
-            </el-form-item>
-
-            <el-form-item label="排序">
-                <el-select v-model="queryUser.bossId" placeholder="无所属">
-                    <el-option label="有所属" value="1"></el-option>
-                    <el-option label="无所属" value="0"></el-option>
-                    <el-option label="所有" value="-1"></el-option>
-                </el-select>
-            </el-form-item>
-
-            <el-form-item>
-                <el-button type="primary" @click="querySon">查询</el-button>
-            </el-form-item>
-        </el-form>
-
-        <!--        所有经理信息展示-->
-        <template>
-            <el-table
-                    :data="allManager"
-                    style="width: 100%"
-                    height="250">
-
-                <el-table-column
-                        type="index"
-                        width="50">
-                </el-table-column>
-
-                <el-table-column
-                        label="经理"
-                        width="180">
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{ scope.row.userName }}</span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column
-                        label="性别"
-                        width="200"
-                        :formatter="genderFormatter">
-                    <template slot-scope="scope">
-                        <!--                        <el-tag size="medium">{{ scope.row.gender }}</el-tag>-->
-                        <span style="medium: 10px">{{genderFormatter(scope.row.gender) }}</span>
-
-                    </template>
-                </el-table-column>
-
-                <el-table-column
-                        label="入职时间"
-                        width="180"
-                >
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{scope.row.hireDate }}</span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column
-                        label="上级姓名"
-                        width="200">
-                    <template slot-scope="scope">
-                        <div slot="reference" class="gender">
-                            <span style="margin-left: 10px">{{ scope.row.bossName }}</span>
-                        </div>
-                    </template>
-                </el-table-column>
-
-                <el-table-column
-                        label="任务"
-                        width="180"
-                >
-                    <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{scope.row.taskName}}</span>
-                    </template>
-                </el-table-column>
-
-
-                <el-table-column label="操作">
-                    <template slot-scope="scope">
-                        <el-button
-                                size="mini"
-                                @click="handleInMyTeam(scope.$index, scope.row)"
-                        >进队
-                        </el-button>
-
-                        <!--                        <el-button-->
-                        <!--                                size="mini"-->
-                        <!--                                @click="handleQuery(scope.$index, scope.row)"-->
-                        <!--                        >查看-->
-                        <!--                        </el-button>-->
-                    </template>
-                </el-table-column>
-            </el-table>
-        </template>
-
+        </el-container>
 
     </el-container>
-
-</el-container>
 
 
 <!--导入依赖-->
@@ -563,11 +568,6 @@
 <script src="element-ui/lib/index.js"></script>
 <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
 
-<!--<script type="module">-->
-<!--    import global from './js/global.js'-->
-<!--    Vue.prototype.global = global-->
-<!--</script>-->
-
 
 <script type="module">
     new Vue({
@@ -575,11 +575,8 @@
 
 
         mounted() {
-            //页面渲染结束后,发送异步请求,获取数据
-            // const username = window.sessionStorage.getItem("username");
-            // console.log("username = "+username);
 
-            // let myName = JSON.parse(sessionStorage.getItem("username"));
+            //页面渲染结束后,发送异步请求,获取数据
             const _this = this;
             axios({
                 method: "post",
@@ -633,6 +630,18 @@
                 }
             };
 
+            const validateUserName = (rule, value, callback) => {
+                const _this = this;
+                let a = 'SCRIPT',b = 'script',c = 'html';
+                console.log(value.indexOf(b));
+                if(value.indexOf(a) > 0||value.indexOf(b) > 0||value.indexOf(c) > 0){
+                    callback(new Error("请勿输入非法字符"));
+                }else{
+                    callback();
+                }
+            };
+
+            //数据
             return {
                 websocket: '',
 
@@ -665,6 +674,7 @@
                     taskName: [
                         {required: true, message: '请输入任务名称', trigger: 'blur'},
                         {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                        {validator: validateUserName, trigger: 'blur'}
                     ],
                     deadline: [
                         {required: true, message: '请输入截止日期', trigger: 'blur'},
@@ -781,30 +791,8 @@
 
         methods: {
 
+            //建立ws
             createWebSocket() {
-
-                // var heartCheck = {
-                //     timeout: 1000,        //1分钟发一次心跳
-                //     timeoutObj: null,
-                //     serverTimeoutObj: null,
-                //     reset: function(){
-                //         clearTimeout(this.timeoutObj);
-                //         clearTimeout(this.serverTimeoutObj);
-                //         return this;
-                //     },
-                //     start: function(){
-                //         var _this = this;
-                //         this.timeoutObj = setTimeout(function(){
-                //             //这里发送一个心跳，后端收到后，返回一个心跳消息，
-                //             //onmessage拿到返回的心跳就说明连接正常
-                //             _this.handleMsg("ping");
-                //             console.log("ping!")
-                //             _this.serverTimeoutObj = setTimeout(function(){//如果超过一定时间还没重置，说明后端主动断开了
-                //                 _this.websocket.close();     //如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
-                //             }, _this.timeout)
-                //         }, this.timeout)
-                //     }
-                // };
 
                 const _this = this;
                 _this.websocket = new WebSocket('ws://localhost:8080/qg-engineering-management-system/webSocket')
@@ -842,32 +830,20 @@
                 }
             },
 
-            // handleMsg(msg) {
-            //     let that = this;
-            //     console.log(that.global.ws);
-            //     if (that.global.ws && that.global.ws.readyState === 1) {
-            //         console.log("发送信息", msg);
-            //         that.global.ws.send(msg);
-            //     }
-            //     that.global.ws.onmessage =  event => {
-            //         console.log("收到服务器内容", event.data);
-            //         that.$message.success(event.data);
-            //     };
-            // },
-
             //个人信息跳转
             personInfo() {
                 window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
             },
 
-            teamButton(){
+            //队伍跳转
+            teamButton() {
                 window.location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
             },
 
-            noticeButton(){
+            //通知跳转
+            noticeButton() {
                 window.location.href = "http://localhost:8080/qg-engineering-management-system/notice.html";
             },
-
 
 
             //退出登录
@@ -924,7 +900,7 @@
                         data: row.userId,
                     }).then(function (resp) {
                         if (resp.data.code === 200) {
-                            setTimeout(_this.refresh, 100);
+                            setTimeout(_this.refresh, 500);
                         }
                     })
                 }).catch(() => {
@@ -986,7 +962,9 @@
                                 document.getElementById("teamAddButton").disabled = true;
                                 _this.teamAddFormVisible = false;
                                 _this.$message.success("任务添加成功");
-                                setTimeout(_this.refresh, 100);
+                                setTimeout(_this.refresh, 500);
+                            }else if (resp.data.code === 400) {
+                                _this.$message.error(resp.data.msg);
                             }
                         })
                     } else {
@@ -1015,6 +993,8 @@
                                 _this.teamModifyFormVisible = false;
                                 _this.$message.success("任务修改成功");
                                 setTimeout(_this.refresh, 500);
+                            }else if (resp.data.code === 400) {
+                                _this.$message.error(resp.data.msg);
                             }
                         })
                     } else {
@@ -1138,7 +1118,7 @@
                         data: row.userId + "&" + row.taskId,
                     }).then(function (resp) {
                         if (resp.data.code === 200) {
-                            setTimeout(_this.refresh, 100);
+                            setTimeout(_this.refresh, 500);
                         }
                     })
 
@@ -1188,7 +1168,7 @@
 
                                 _this.dialogFormVisible = false;
                                 _this.$message.success("任务添加成功");
-                                setTimeout(_this.refresh, 100);
+                                setTimeout(_this.refresh, 500);
                             }
                         })
                     } else {

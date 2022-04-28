@@ -1,14 +1,18 @@
 package cn.stopyc.web.filter;
 
-import cn.stopyc.constant.SessionConstant;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
+/**
+* @Description: 登录过滤器,防止没登录过的人直接访问后台代码
+* @Param:
+* @return:
+* @Author: stop.yc
+* @Date: 2022/4/28
+*/
 @WebFilter("/*")
 public class LoginFilter implements Filter {
 
@@ -46,7 +50,7 @@ public class LoginFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) {
 
     }
 

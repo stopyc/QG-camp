@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
     public Result<Integer> login(String userName, String password) {
 
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
+
         //1.dao类进行查询登录的用户信息
         User user = userDao.selectByNameAndPassword(userName, password);
 
@@ -91,8 +92,12 @@ public class UserServiceImpl implements UserService {
             usernames.add(u.getUserName());
         }
 
+
+        //4.包括自己
+        usernames.add(user.getUserName());
+
         //4.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
-        if (!msg.contains("上线") || msg.contains("离线")) {
+        if (!msg.contains("上线") || msg.contains("下线")) {
             NoticeService noticeService = SingletonFactory.getNoticeServiceSingleton();
             noticeService.sendNotice(user,usernames,msg);
         }
@@ -241,6 +246,7 @@ public class UserServiceImpl implements UserService {
         }
 
         //10.发送消息
+        sendNotice(userByUserId.getUserName() + "已被踢出队伍",userByUserId);
         sendNotice(userByUserId.getUserName() + "已被踢出队伍",boss);
     }
 
@@ -367,6 +373,8 @@ public class UserServiceImpl implements UserService {
 
         //5.发送消息
         sendNotice(userByUserId.getUserName()+"进入了"+bossName+"的队伍",user);
+        sendNotice(userByUserId.getUserName()+"进入了"+bossName+"的队伍",userByUserId);
+
 
         return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
     }
