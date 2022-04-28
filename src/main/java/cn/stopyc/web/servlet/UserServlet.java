@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @program: qg-engineering-management-system
@@ -145,7 +146,7 @@ public class UserServlet extends BaseServlet{
         //3.获取当前用户的id
         Integer bossId = userService.getIdByName(username);
 
-        Result<MyTeam> myTeamResult = userService.selectMyTeam(bossId);
+        Result<List<MyTeam>> myTeamResult = userService.selectMyTeam(bossId);
 
         JsonUtil.toJson(myTeamResult,resp);
     }
@@ -205,7 +206,7 @@ public class UserServlet extends BaseServlet{
         //3.获取userService对象
         UserService userService = SingletonFactory.getUserServiceSingleton();
 
-        Result<QueryUser> result = userService.queryUser(queryUser,Integer.parseInt(split[1]));
+        Result<List<QueryUser>> result = userService.queryUser(queryUser,Integer.parseInt(split[1]));
 
 
         JsonUtil.toJson(result,resp);

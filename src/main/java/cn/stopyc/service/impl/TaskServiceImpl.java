@@ -3,9 +3,9 @@ package cn.stopyc.service.impl;
 import cn.stopyc.bean.SingletonFactory;
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
+import cn.stopyc.constant.SystemConstant;
 import cn.stopyc.dao.TaskDao;
 import cn.stopyc.dao.UserDao;
-import cn.stopyc.dao.impl.TaskDaoImpl;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.NoticeService;
@@ -56,7 +56,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Result getTaskCompleteByUserId(Integer userId) {
+    public Result<Object> getTaskCompleteByUserId(Integer userId) {
 
         //1.获取dao
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
@@ -71,15 +71,15 @@ public class TaskServiceImpl implements TaskService {
         int generalId = user.getTaskId();
         int taskId = user.getTaskId();
 
-        List<Task> tasks = new ArrayList<>();
         String data;
         //3.是总负责人的话,那么要全部信息
         Integer position = user.getPosition();
         //count:总的子任务数,noCompleteCount:子任务未完成的数量
         int count = 0,completeCount = 0;
+        List<Task> sonTasks;
         if (position == 0) {
             //4.获取总任务的所有子任务
-            List<Task> sonTasks= taskDao.getLittleTask(generalId);
+            sonTasks = taskDao.getLittleTask(generalId);
             List<Integer> fatherTasksIds = new ArrayList<>();
             //5.获取子任务的任务id,和对应父级的id
             for (Task sonTask : sonTasks) {
@@ -97,32 +97,27 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
             //数据展示
-            data = completeCount + " / " + count;
 
         }else{
-            List<Task> sonTasks = taskDao.getSonTasks(taskId + "");
+            sonTasks = taskDao.getSonTasks(taskId + "");
 
-            count = sonTasks.size();
-            if (count == 0) {
-
-            }
             for (Task sonTask : sonTasks) {
                 if (sonTask.getStatus() == 1) {
                     completeCount++;
                 }
             }
-            data = completeCount + " / " + count;
         }
+        data = completeCount + " / " + count;
 
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),data);
+        return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),data);
     }
 
     @Override
-    public Result ok(String taskId) {
+    public Result<Object> ok(String taskId) {
 
         //1.没有任务
         if (StringUtil.isEmpty(taskId)) {
-            return new Result(ResultEnum.NO_TASK.getCode(),ResultEnum.NO_TASK.getMsg());
+            return new Result<>(ResultEnum.NO_TASK.getCode(),ResultEnum.NO_TASK.getMsg());
         }
 
         //2.获取dao
@@ -134,7 +129,7 @@ public class TaskServiceImpl implements TaskService {
         for (Task sonTask : sonTasks) {
             //存在未完成的子任务
             if (sonTask.getStatus() == 0) {
-                return new Result(ResultEnum.INCOMPLETE_TASK.getCode(),ResultEnum.INCOMPLETE_TASK.getMsg());
+                return new Result<>(ResultEnum.INCOMPLETE_TASK.getCode(),ResultEnum.INCOMPLETE_TASK.getMsg());
             }
         }
         //子级任务都完成了,或者没有子级任务,完成.应该分多种职位进行任务表和用户表的修改
@@ -142,41 +137,38 @@ public class TaskServiceImpl implements TaskService {
         User user = userDao.getUserByTaskId(taskId);
         //5.职位判断,(如果是总负责人,任务完成后,应该是相关的全部任务结束,并删除,其他的只是下级结束,但不删除,可以给总负责人看详细情况)
         int position = user.getPosition();
-        switch (position){
-            //5.1总负责人,任务完成后,把数据库中任务的所有子任务全部删除,相关用户全部任务删除
-            case 0:
-                //5.1.1获取所有的子级任务,然后可以改用户的任务id
-                List<Task> littleTask = taskDao.getLittleTask(Integer.parseInt(taskId));
-                //5.1.2把用户的任务id删了,
-                for (Task task : littleTask) {
-                    userDao.deleteTask(task.getTaskId());
-                }
-                //5.1.3把总任务status设为1
-                taskDao.updateStatus(Integer.valueOf(taskId));
-                //5.1.4把任务表中总任务是这一个的全部删除
-                taskDao.deleteTask(Integer.valueOf(taskId));
-                break;
+        //5.1总负责人,任务完成后,把数据库中任务的所有子任务全部删除,相关用户全部任务删除
+        //5.1.1获取所有的子级任务,然后可以改用户的任务id
+        if (position == 0) {
+            List<Task> littleTask = taskDao.getLittleTask(Integer.parseInt(taskId));
+            //5.1.2把用户的任务id删了,
+            for (Task task : littleTask) {
+                userDao.deleteTask(task.getTaskId());
+            }
+            //5.1.3把总任务status设为1
+            taskDao.updateStatus(Integer.valueOf(taskId));
+            //5.1.4把任务表中总任务是这一个的全部删除
+            taskDao.deleteTask(Integer.valueOf(taskId));
 
             //5.2 其他人
-            default:
-                //5.2.1获取下级任务集合,对用户的任务id删除
-                for (Task sonTask : sonTasks) {
-                    userDao.deleteTask(sonTask.getTaskId());
-                    //5.2.2区别于总负责人,它需要删除下级的任务,但是,其他人只需要更改任务状态,不删除
-                    taskDao.updateStatus(sonTask.getTaskId());
-                }
-                //5.2.3最后把传进来的也设为完成
-                taskDao.updateStatus(Integer.parseInt(taskId));
+        } else {//5.2.1获取下级任务集合,对用户的任务id删除
+            for (Task sonTask : sonTasks) {
+                userDao.deleteTask(sonTask.getTaskId());
+                //5.2.2区别于总负责人,它需要删除下级的任务,但是,其他人只需要更改任务状态,不删除
+                taskDao.updateStatus(sonTask.getTaskId());
+            }
+            //5.2.3最后把传进来的也设为完成
+            taskDao.updateStatus(Integer.parseInt(taskId));
         }
 
         //6.发送消息
         sendNotice(user.getUserName() + "已完成任务", user);
 
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+        return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }
 
     @Override
-    public Result add(Task task,int userId) {
+    public Result<Object> add(Task task,int userId) {
         //1.获取dao
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
@@ -202,7 +194,7 @@ public class TaskServiceImpl implements TaskService {
         //7.发送消息
         sendNotice(user.getUserName() + "获得了一个新任务", user);
 
-        return new Result(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
+        return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg());
     }
 
     @Override
@@ -294,7 +286,7 @@ public class TaskServiceImpl implements TaskService {
         usernames.add(user.getUserName());
 
         //5.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
-        if (!msg.contains("上线") || msg.contains("下线")) {
+        if (!msg.contains(SystemConstant.UP) || msg.contains(SystemConstant.DOWN)) {
             NoticeService noticeService = SingletonFactory.getNoticeServiceSingleton();
             noticeService.sendNotice(user,usernames,msg);
         }

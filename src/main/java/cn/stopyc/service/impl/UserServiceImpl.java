@@ -5,10 +5,9 @@ import cn.stopyc.bean.QueryUser;
 import cn.stopyc.bean.SingletonFactory;
 import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
+import cn.stopyc.constant.SystemConstant;
 import cn.stopyc.dao.TaskDao;
 import cn.stopyc.dao.UserDao;
-import cn.stopyc.dao.impl.TaskDaoImpl;
-import cn.stopyc.dao.impl.UserDaoImpl;
 import cn.stopyc.po.Task;
 import cn.stopyc.po.User;
 import cn.stopyc.service.NoticeService;
@@ -18,9 +17,7 @@ import cn.stopyc.util.Md5Utils;
 import cn.stopyc.util.StringUtil;
 import cn.stopyc.util.TimeUtils;
 import cn.stopyc.web.ws.WebSocket;
-import sun.security.provider.MD5;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +94,7 @@ public class UserServiceImpl implements UserService {
         usernames.add(user.getUserName());
 
         //4.发送离线,现在usernames中的人就是需要收到消息的人,那么我们要写表了,参数,谁发的,发给谁,信息是什么
-        if (!msg.contains("上线") || msg.contains("下线")) {
+        if (!msg.contains(SystemConstant.UP) || msg.contains(SystemConstant.DOWN)) {
             NoticeService noticeService = SingletonFactory.getNoticeServiceSingleton();
             noticeService.sendNotice(user,usernames,msg);
         }
@@ -125,12 +122,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result checkCheckCode(String checkCode, String checkCodeGen) {
+    public Result<Object> checkCheckCode(String checkCode, String checkCodeGen) {
         //验证码对了
         if (StringUtil.isEmpty(checkCode) || !checkCode.equalsIgnoreCase(checkCodeGen)) {
-            return new Result(ResultEnum.CHECK_CODE_ERROR.getCode(), ResultEnum.CHECK_CODE_ERROR.getMsg());
+            return new Result<>(ResultEnum.CHECK_CODE_ERROR.getCode(), ResultEnum.CHECK_CODE_ERROR.getMsg());
         } else {
-            return new Result(200);
+            return new Result<>(200);
         }
     }
 
@@ -162,7 +159,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<MyTeam> selectMyTeam(Integer bossId) {
+    public Result<List<MyTeam>> selectMyTeam(Integer bossId) {
         //1.获取dao
         //2.其他人获取下一级的用户,小工获取同级同队伍的成员
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
@@ -171,7 +168,7 @@ public class UserServiceImpl implements UserService {
         User worker = userDao.getUserByUserId(bossId);
 
         //下级用户集合
-        List<User> users = null;
+        List<User> users;
         //4.是小工
         if (worker.getPosition() == 3) {
             Integer bossIdOfWorker = worker.getBossId();
@@ -208,7 +205,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
-        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), myTeams);
+        return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), myTeams);
     }
 
     @Override
@@ -251,7 +248,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<QueryUser> queryUser(User user, Integer sort) {
+    public Result<List<QueryUser>> queryUser(User user, Integer sort) {
         //1.获取dao
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
@@ -353,11 +350,11 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
-        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), queryUsers);
+        return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg(), queryUsers);
     }
 
     @Override
-    public Result inTeam(Integer inTeamUserId, String bossName) {
+    public Result<Object> inTeam(Integer inTeamUserId, String bossName) {
 
         //1.获取dao
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
@@ -376,11 +373,11 @@ public class UserServiceImpl implements UserService {
         sendNotice(userByUserId.getUserName()+"进入了"+bossName+"的队伍",userByUserId);
 
 
-        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
+        return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
     }
 
     @Override
-    public Result changePassword(String oldPassword, String newPassword, String username) {
+    public Result<Object> changePassword(String oldPassword, String newPassword, String username) {
 
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
 
@@ -389,19 +386,19 @@ public class UserServiceImpl implements UserService {
 
         //2.不成功则直接返回
         if (!Md5Utils.getMD5(oldPassword).equals(user.getPassword())) {
-            return new Result(ResultEnum.PASSWORD_FAILED.getCode(), ResultEnum.PASSWORD_FAILED.getMsg());
+            return new Result<>(ResultEnum.PASSWORD_FAILED.getCode(), ResultEnum.PASSWORD_FAILED.getMsg());
         }
 
         //3.成功就修改密码
         userDao.changePassword(Md5Utils.getMD5(newPassword), user.getUserId());
 
-        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
+        return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
 
 
     }
 
     @Override
-    public Result modifyInfo(User user, String oldName) {
+    public Result<Object> modifyInfo(User user, String oldName) {
         UserDao userDao = SingletonFactory.getUserDaoSingleton();
 
         //1.获取数据库中的该用户,
@@ -410,7 +407,7 @@ public class UserServiceImpl implements UserService {
         //2.得到id进行修改对应信息
         userDao.updateUser(user.getUserName(), user.getEmail(), user.getGender(), user1.getUserId());
 
-        return new Result(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
+        return new Result<>(ResultEnum.SUCCESS.getCode(), ResultEnum.SUCCESS.getMsg());
     }
 
     @Override

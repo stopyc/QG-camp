@@ -5,6 +5,8 @@ import cn.stopyc.bean.QueryUser;
 import cn.stopyc.constant.Result;
 import cn.stopyc.po.User;
 
+import java.util.List;
+
 /**
 * @Description: 用户service层
 * @Param:
@@ -64,7 +66,7 @@ public interface UserService {
      * @param bossId:上级id
      * @return 返回结果集(队伍信息)
      */
-    Result<MyTeam> selectMyTeam(Integer bossId);
+    Result<List<MyTeam>> selectMyTeam(Integer bossId);
 
 
     /**
@@ -80,7 +82,7 @@ public interface UserService {
      * @param sort:排序方式
      * @return 返回结果集(查询用户)
      */
-    Result<QueryUser> queryUser(User queryUser, Integer sort);
+    Result<List<QueryUser>> queryUser(User queryUser, Integer sort);
 
 
     /**

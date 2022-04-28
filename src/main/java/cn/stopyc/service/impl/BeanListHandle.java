@@ -18,7 +18,10 @@ import java.util.List;
 public class BeanListHandle<T> implements IResultSetHandler<List<T>> {
     private Class<T> clazz;
 
-    //获取当前对象的字节码信息
+    /**
+        获取当前对象的字节码信息
+     *
+     */
     public BeanListHandle(Class<T> clazz) {
         this.clazz = clazz;
     }

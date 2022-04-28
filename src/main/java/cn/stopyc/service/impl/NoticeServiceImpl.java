@@ -6,7 +6,6 @@ import cn.stopyc.constant.Result;
 import cn.stopyc.constant.ResultEnum;
 import cn.stopyc.dao.NoticeDao;
 import cn.stopyc.dao.UserDao;
-import cn.stopyc.dao.impl.NoticeDaoImpl;
 import cn.stopyc.po.Notice;
 import cn.stopyc.po.User;
 import cn.stopyc.service.NoticeService;
@@ -14,9 +13,7 @@ import cn.stopyc.util.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @program: qg-engineering-management-system
@@ -56,7 +53,7 @@ public class NoticeServiceImpl implements NoticeService {
         for (String username : usernames) {
             User u = userDao.selectByName(username);
             msg1.add(msg);
-            sb.append("(").append("'"+notifierId+"'").append(",").append("?").append(",").append("'"+time+"'").append(",").append("'"+u.getUserId()+"'").append("),");
+            sb.append("(").append("'").append(notifierId).append("'").append(",").append("?").append(",").append("'").append(time).append("'").append(",").append("'").append(u.getUserId()).append("'").append("),");
         }
 
         //7.处理sql语句

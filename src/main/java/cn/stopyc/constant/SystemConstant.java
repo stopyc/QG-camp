@@ -22,6 +22,10 @@ public class SystemConstant {
 
     public static int MIN_PASSWORD_LENGTH;
 
+    public static String  UP = "上线";
+
+    public static String  DOWN = "下线";
+
     static {
         try {
             InputStream in = MyDataSource.class.getClassLoader().getResourceAsStream("system.properties");

@@ -35,7 +35,6 @@ public class BeanHandler<T> implements IResultSetHandler<T> {
             //遍历描述器,进行获取查询结果的对象信息进行封装
             for (PropertyDescriptor pd : pds) {
                 //获取查询结果集的对应字段的信息
-                String name = pd.getName();
 
                 Object object = rs.getObject(pd.getName());
 

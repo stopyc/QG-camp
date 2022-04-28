@@ -6,21 +6,14 @@ import cn.stopyc.po.User;
 import cn.stopyc.service.impl.BeanHandler;
 import cn.stopyc.service.impl.BeanListHandle;
 import cn.stopyc.util.CRUDUtils;
-import cn.stopyc.util.DbUtil;
 import cn.stopyc.util.TimeUtils;
 
-import javax.swing.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Time;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
  * @program: qg-engineering-management-system
- * @description:实现dao类
+ * @description: 实现dao类
  * @author: stop.yc
  * @create: 2022-04-17 22:37
  **/
