@@ -6,7 +6,7 @@
     <style>
         .center {
             width: 500px;
-            height: 500px;
+            height: 550px;
             background-color: gainsboro;
             border-radius: 5px;
             position: absolute;
@@ -84,6 +84,10 @@
                         </el-select>
                     </el-form-item>
                 </template>
+                <el-form-item label="注册码:" prop="code">
+                    <el-input v-model="code" style="width: 300px;"
+                              ></el-input>
+                </el-form-item>
 
                 <el-form-item>
 
@@ -164,6 +168,17 @@
                     }
                 })
             };
+
+            const validatePosition = (rule, value, callback) => {
+                const _this = this;
+                if (_this.code.charAt(0) === _this.user.position){
+                    callback();
+                }else {
+                    callback(new Error("请输入正确的注册码"));
+                }
+
+            };
+
             // const validateCheckCode = (rule,value,callback) =>{
             //
             //     const _this = this;
@@ -183,6 +198,8 @@
 
 
             return {
+                //邀请码
+                code:"",
                 //用户职位选择
                 options: [{
                     value: '0',
@@ -243,6 +260,7 @@
                     // ]
                     position: [
                         {required: true, message: '请选择您的职位', trigger: 'blur'},
+                        {validator: validatePosition, trigger: 'blur'}
                     ]
                 }
             }
@@ -252,6 +270,7 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+
                         //因为表单校验和需要提交后台的数据不一样,我们另取一个进行封装
                         this.userRegister.username = this.user.username;
                         this.userRegister.password = this.user.password;

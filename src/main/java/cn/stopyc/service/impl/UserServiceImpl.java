@@ -134,7 +134,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<User> register(String userName, String password, String email, Integer position) {
 
-        //在注册的时候,我建议是发送个邮件,可以验证邮箱是否正确
 
         //性别默认为男,入职时间为现在,bossId为无
 

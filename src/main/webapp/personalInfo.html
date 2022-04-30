@@ -182,6 +182,10 @@
             const validateUserName = (rule, value, callback) => {
 
                 const _this = this;
+                let a = 'SCRIPT',b = 'script',c = 'html';
+                if(value.indexOf(a) > 0||value.indexOf(b) > 0||value.indexOf(c) > 0){
+                    callback(new Error("请勿输入非法字符"));
+                }
                 if (value === _this.username) {
                     callback();
                 }

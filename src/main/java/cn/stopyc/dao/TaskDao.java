@@ -17,23 +17,23 @@ public interface TaskDao {
 
     /**
      * 根据用户id获取任务
-     * @param idByName
-     * @return
+     * @param idByName:用户id
+     * @return: 返回任务对象
      */
     Task getTaskByUserId(Integer idByName);
 
     /**
      * 通过任务id集合获取最子任务总数
-     * @param generalTaskId
-     * @return
+     * @param generalTaskId:任务id
+     * @return: 任务集合
      */
     List<Task> getLittleTask(int generalTaskId);
 
 
     /**
      * 通过任务id,获取子级任务集合
-     * @param taskId
-     * @return
+     * @param taskId:任务id
+     * @return: 任务集合
      */
     List<Task> getSonTasks(String taskId);
 
@@ -57,31 +57,18 @@ public interface TaskDao {
      */
     void addTask(Task task, int userId);
 
-//    /**
-//     * 根据任务id集合获取任务集合
-//     * @param taskIds
-//     * @return
-//     */
-//    List<Task> getAllTaskByIds(List<Integer> taskIds);
-
-//    /**
-//     * 根据总任务id获取最低层任务集合
-//     * @param generalId
-//     * @return
-//     */
-//    List<Task> getLittlestTasks(int generalId);
 
     /**
      * 设置最级任务id
-     * @param generalId
-     * @param userId
+     * @param generalId:最级任务id
+     * @param userId: 用户id
      */
     void setGeneralId(int generalId,int userId) ;
 
     /**
      * 通过用户集合获取任务集合
-     * @param users
-     * @return
+     * @param users:用户集合
+     * @return: 任务集合
      */
     List<Task> selectTasksByUsers(List<User> users);
 

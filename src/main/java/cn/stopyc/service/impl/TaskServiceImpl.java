@@ -37,11 +37,9 @@ public class TaskServiceImpl implements TaskService {
         //1.获取dao
         TaskDao taskDao = SingletonFactory.getTaskDaoSingleton();
 
-        System.out.println("id "+idByName);
         //2.通过用户id获取任务对象
         Task task = taskDao.getTaskByUserId(idByName);
 
-        System.out.println("task"+task);
 
         //3.找不到任务,那就没有任务
         if (task == null) {
@@ -50,7 +48,6 @@ public class TaskServiceImpl implements TaskService {
         //4.有的话就以集合的形式返回,(前端接受表格)
             List<Task> list = new ArrayList<>();
             list.add(task);
-            System.out.println("task = " + list);
             return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),list);
         }
     }
@@ -102,6 +99,7 @@ public class TaskServiceImpl implements TaskService {
             sonTasks = taskDao.getSonTasks(taskId + "");
 
             for (Task sonTask : sonTasks) {
+                count++;
                 if (sonTask.getStatus() == 1) {
                     completeCount++;
                 }
