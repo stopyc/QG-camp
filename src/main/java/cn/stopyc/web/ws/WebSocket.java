@@ -2,7 +2,11 @@ package cn.stopyc.web.ws;
 
 
 import cn.stopyc.constant.Result;
+import cn.stopyc.util.JsonUtil;
+import com.alibaba.fastjson.JSONObject;
 
+import javax.json.JsonObject;
+import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -97,6 +101,7 @@ public class WebSocket {
             for (WebSocket item : clients.values()) {
                 try {
                     item.session.getBasicRemote().sendText(msgToUsers.getMsg());
+//                    item.session.getBasicRemote().sendText(JSONObject.toJSONString(msgToUsers));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -114,6 +119,7 @@ public class WebSocket {
                     try {
                         //4.通过键(姓名)获取ws链接,获取session,发送消息.
                         clients.get(username).session.getBasicRemote().sendText(msgToUsers.getMsg());
+//                        clients.get(username).session.getBasicRemote().sendText(JSONObject.toJSONString(msgToUsers););
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

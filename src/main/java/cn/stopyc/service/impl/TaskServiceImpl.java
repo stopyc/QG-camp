@@ -105,6 +105,10 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
         }
+        if (completeCount == 0 && count == 0) {
+            count = 1;
+            completeCount = 1;
+        }
         data = completeCount + " / " + count;
 
         return new Result<>(ResultEnum.SUCCESS.getCode(),ResultEnum.SUCCESS.getMsg(),data);

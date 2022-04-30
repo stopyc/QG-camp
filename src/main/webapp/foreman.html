@@ -52,6 +52,9 @@
             <el-tag v-model="username">{{username}}</el-tag>
         </el-header>
 
+        <el-tag >项目完成进度条</el-tag><br>
+        <el-progress :percentage="percentage" status="success"></el-progress>
+
         <!--        我的任务列表-->
         <el-form :inline="true" :model="myTaskTableData" class="myTaskTableData">
             <template>
@@ -465,6 +468,8 @@
                 address: '上海市普陀区金沙江路 1518 弄'
             };
             return {
+
+                percentage:0,
                 websocket:'',
 
                 //工程小组详情表格
@@ -642,6 +647,11 @@
                     console.log(event.data)
                     _this.myMsg = event.data;
                     const h = this.$createElement;
+
+                    if (_this.myTaskTableData.length > 0){
+                        console.log(_this.myTaskTableData[0].userId);
+                        _this.selectAllTaskCount(_this.myTaskTableData[0].userId);
+                    }
 
                     this.$notify({
                         title: '消息通知',
@@ -977,6 +987,35 @@
                 }).then(function (resp) {
                     if (resp.data.code === 200) {
                         _this.myTaskTableData[0].allTaskCount = resp.data.data;
+                        const array = resp.data.data.split(" / ");
+                        if (array[1] === '0' && array[0] === '0') {
+                            if (_this.myTaskTableData[0].status === 1) {
+                                _this.percentage = 100;
+                            }else {
+                                _this.percentage = 0;
+
+                            }
+                            return ;
+                        }
+
+
+                        if (array[1] === '1' && array[0] === '1'){
+                            if (_this.myTaskTableData[0].status === 0) {
+                                _this.percentage = 0;
+                                return ;
+                            }else {
+                                _this.percentage = 100;
+                                return ;
+                            }
+                        }
+                        if (array[1] === '0' || array[0] === '0') {
+                            _this.percentage = 0;
+                            return ;
+                        }
+                        console.log(array[0])
+                        console.log(array[1])
+
+                        _this.percentage = parseInt(array[0])*100  / parseInt(array[1])
                     }
                 })
             },
