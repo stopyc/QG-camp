@@ -2,6 +2,7 @@ package cn.stopyc.web.ws;
 
 
 import cn.stopyc.constant.Result;
+import cn.stopyc.util.CheckUtil;
 import cn.stopyc.util.JsonUtil;
 import com.alibaba.fastjson.JSONObject;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,6 +79,9 @@ public class WebSocket {
     public void onMessage(String message) {
         //客户端发送的信息
         System.out.println("客户端发送的给后台消息:" + message);
+
+        List<String> names = new ArrayList<>(clients.keySet());
+        sendMessage(new Result<>(200, CheckUtil.XssAndHtml(message),names));
 
     }
 

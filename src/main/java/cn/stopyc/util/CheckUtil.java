@@ -110,13 +110,13 @@ public class CheckUtil {
                     sb.append("\\\\");
                     break;
                 case '<':
-                    sb.append("&lt;");
+                    sb.append("＜");
                     break;
                 case '>':
-                    sb.append("&gt;");
+                    sb.append("＞");
                     break;
                 case '&':
-                    sb.append("&amp;");
+                    sb.append("＆");
                     break;
                 default:
                     sb.append(c);

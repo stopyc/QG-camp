@@ -36,6 +36,10 @@
             <el-menu-item index="3">
                 <el-button @click="noticeButton" target="_blank">消息通知</el-button>
             </el-menu-item>
+
+            <el-menu-item index="3">
+                <el-button @click="chatButton" target="_blank">聊天室</el-button>
+            </el-menu-item>
         </el-menu>
     </el-aside>
 
@@ -1069,6 +1073,11 @@
 
                 });
             },
+
+            chatButton(){
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/chat.html";
+            },
+
             //更新总任务和完成情况
             selectAllTaskCount(id) {
                 const _this = this;
