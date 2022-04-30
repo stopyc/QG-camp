@@ -99,7 +99,7 @@
                     <el-table-column
                             prop="allTaskCount"
                             align="center"
-                            label="完成/子任务总数"
+                            label="子任务完成情况"
                     >
                     </el-table-column>
 
@@ -107,7 +107,7 @@
                     <el-table-column
                             prop="status"
                             align="center"
-                            label="当前状态"
+                            label="任务状态"
                             :formatter="statusFormatter1"
                     >
                     </el-table-column>
@@ -648,7 +648,7 @@
                     _this.myMsg = event.data;
                     const h = this.$createElement;
 
-                    if (_this.myTaskTableData.length > 0){
+                    if (_this.myTaskTableData[0].userId !== '' && _this.myTaskTableData[0].userId!== 0){
                         console.log(_this.myTaskTableData[0].userId);
                         _this.selectAllTaskCount(_this.myTaskTableData[0].userId);
                     }
@@ -999,15 +999,16 @@
                         }
 
 
-                        if (array[1] === '1' && array[0] === '1'){
-                            if (_this.myTaskTableData[0].status === 0) {
-                                _this.percentage = 0;
-                                return ;
-                            }else {
-                                _this.percentage = 100;
-                                return ;
-                            }
-                        }
+                        // if (array[1] === '1' && array[0] === '1'){
+                        //     if (_this.myTaskTableData[0].status === 0) {
+                        //         _this.percentage = 0;
+                        //         return ;
+                        //     }else {
+                        //         _this.percentage = 100;
+                        //         return ;
+                        //     }
+                        // }
+
                         if (array[1] === '0' || array[0] === '0') {
                             _this.percentage = 0;
                             return ;

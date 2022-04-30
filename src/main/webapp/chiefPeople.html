@@ -98,7 +98,7 @@
                         <el-table-column
                                 prop="allTaskCount"
                                 align="center"
-                                label="完成/总数"
+                                label="小工完成情况"
                         >
                         </el-table-column>
 
@@ -106,7 +106,7 @@
                         <el-table-column
                                 prop="status"
                                 align="center"
-                                label="当前状态"
+                                label="任务状态"
                                 :formatter="statusFormatter1"
                         >
                         </el-table-column>
@@ -818,7 +818,7 @@
                     _this.myMsg = event.data;
                     const h = this.$createElement;
 
-                    if (_this.myTaskTableData.length > 0){
+                    if (_this.myTaskTableData[0].userId !== '' && _this.myTaskTableData[0].userId!== 0){
                         console.log(_this.myTaskTableData[0].userId);
                         _this.selectAllTaskCount(_this.myTaskTableData[0].userId);
                     }
@@ -1217,10 +1217,9 @@
                         if (array[1] === '0' || array[0] === '0') {
                             _this.percentage = 0;
                         }else {
-                            console.log(array[0])
-                            console.log(array[1])
+
+
                             _this.percentage = parseInt(array[0])*100  / parseInt(array[1])
-                            console.log(_this.percentage);
                         }
 
                     }

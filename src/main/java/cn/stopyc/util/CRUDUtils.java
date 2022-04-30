@@ -5,7 +5,6 @@ import cn.stopyc.service.IResultSetHandler;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * @program: Dream
@@ -30,7 +29,6 @@ public class CRUDUtils {
         try {
             //1.获取连接
             con = DbUtil.getConn();
-            con.setAutoCommit(false);
             //2.执行sql语句
             ps = con.prepareStatement(sql);
             //  params.length 获取可变长度的长度
@@ -38,20 +36,12 @@ public class CRUDUtils {
 
                 ps.setObject(i + 1,params[i]);
             }
-            System.out.println(ps);
             int i = ps.executeUpdate();
-            con.commit();
             return i;
         } catch (Exception e) {
             e.printStackTrace();
-            try {
-                con.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
         }finally {
             try {
-
                 DbUtil.release(con,ps,rs);
             } catch (Exception e) {
                 e.printStackTrace();

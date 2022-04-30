@@ -47,12 +47,12 @@
                 </el-form-item>
 
                 <el-form-item label="用户名:" prop="username">
-                    <el-input v-model="user.username" style="width: 300px;" @blur.native.capture="myOnblur"
+                    <el-input v-model.trim="user.username" style="width: 300px;" @blur.native.capture="myOnblur"
                               :plain="true"></el-input>
                 </el-form-item>
 
                 <el-form-item label="密码" prop="password">
-                    <el-input type="password" v-model="user.password" style="width: 300px;"
+                    <el-input type="password" v-model.trim="user.password" style="width: 300px;"
                               autocomplete="off"></el-input>
                 </el-form-item>
 
@@ -62,7 +62,7 @@
                 </el-form-item>
 
                 <el-form-item prop="email" label="邮箱:">
-                    <el-input v-model="user.email" style="width: 300px;"></el-input>
+                    <el-input v-model.trim="user.email" style="width: 300px;"></el-input>
                 </el-form-item>
 
                 <!--                <el-form-item label="验证码:" prop="checkCode">-->

@@ -67,6 +67,7 @@ public class TaskServiceImpl implements TaskService {
         //3.(总负责人)获取总任务id
         int generalId = user.getTaskId();
         int taskId = user.getTaskId();
+        Task taskByUserId = taskDao.getTaskByUserId(userId);
 
         String data;
         //3.是总负责人的话,那么要全部信息
@@ -107,7 +108,11 @@ public class TaskServiceImpl implements TaskService {
         }
         if (completeCount == 0 && count == 0) {
             count = 1;
-            completeCount = 1;
+            if (taskByUserId != null && taskByUserId.getStatus() == 1) {
+                completeCount = 1;
+            }else {
+                completeCount = 0;
+            }
         }
         data = completeCount + " / " + count;
 
