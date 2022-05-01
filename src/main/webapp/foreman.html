@@ -407,6 +407,9 @@
                 method: "post",
                 url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
             }).then(function (resp) {
+                if (resp.data.data === '') {
+                    return ;
+                }
                 _this.username = resp.data.msg;
                 _this.selectMyTask();
                 _this.selectMyTeam(resp.data.msg);

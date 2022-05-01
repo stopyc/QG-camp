@@ -83,10 +83,8 @@
                         :readonly="true">
                 </el-input>
             </pre>
-            <el-input v-model="input" placeholder="请输入要发送的内容" style="width: 300px"></el-input>
-            <el-button type="primary" @click="sendMsg">发送</el-button>
-
-
+            <el-input v-model="input" placeholder="请输入要发送的内容" style="width: 300px" @keyup.enter.native = 'enterSend'></el-input>
+            <el-button type="primary" @click="sendMsg" :autofocus="true" >发送</el-button>
         </el-main>
 
 
@@ -132,7 +130,11 @@
                 method: "post",
                 url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
             }).then(function (resp) {
+                if (resp.data.data === '') {
+                    return ;
+                }
                 _this.username = resp.data.msg;
+                _this.position = resp.data.data.position;
             })
             //建立ws连接
             _this.createWebSocket();
@@ -147,6 +149,7 @@
                 input: '',
 
                 websocket: '',
+                position:'',
 
                 //登录的用户名
                 username: '',
@@ -158,6 +161,11 @@
 
         methods: {
 
+
+            enterSend(){
+                this.sendMsg();
+
+            },
             sendMsg() {
 
                 if (this.input === '') {
@@ -175,7 +183,15 @@
 
             //队伍跳转
             teamButton() {
-                window.location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
+                if (this.position === 0) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/chiefPeople.html");
+                } else if (this.position === 1) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/engineering.html");
+                } else if (this.position === 2) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/foreman.html");
+                } else if (this.position === 3) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/worker.html");
+                }
             },
 
             //通知跳转
@@ -201,7 +217,7 @@
                     // _this.textarea.append("你好啊~<br>");
                     // _this.textarea.append("你好!<br>");
                     // _this.textarea.append(_this.username+": "+event.data+"<br>");
-                    _this.textarea = _this.textarea + event.data + "'\n";
+                    _this.textarea = _this.textarea + event.data + "\n";
                 }
                 _this.websocket.onclose = function (e) {
                     console.log('关闭了', e.code + ' ' + e.reason + ' ' + e.wasClean);

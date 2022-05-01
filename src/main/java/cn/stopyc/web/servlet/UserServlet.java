@@ -254,9 +254,13 @@ public class UserServlet extends BaseServlet{
 
         UserService userService = SingletonFactory.getUserServiceSingleton();
         Result<User> select = userService.select(username);
-        select.getData().setPassword("");
-
-        Result<Object> result = new Result<>(200,username,select.getData());
+        Result<Object> result;
+        if (select.getData() != null) {
+            select.getData().setPassword("");
+             result = new Result<>(200,username,select.getData());
+        }else {
+            result = new Result<>(200,username,"");
+        }
 
         JsonUtil.toJson(result,resp);
     }

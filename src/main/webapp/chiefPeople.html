@@ -589,14 +589,17 @@
                 method: "post",
                 url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
             }).then(function (resp) {
+                if (resp.data.data === '') {
+                    return ;
+                }
                 _this.username = resp.data.msg;
-                console.log("111 " + _this.username);
                 _this.selectMyTask();
                 _this.selectMyTeam(resp.data.msg);
                 _this.querySon();
             })
 
             //建立ws连接
+
             _this.createWebSocket();
         },
 
