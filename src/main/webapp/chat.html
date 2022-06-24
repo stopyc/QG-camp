@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+
+    <style>
+
+        .el-col {
+            border-radius: 4px;
+        }
+
+        .bg-purple-dark {
+            background: #99a9bf;
+        }
+
+        .bg-purple {
+            background: #d3dce6;
+        }
+
+        .bg-purple-light {
+            background: #e5e9f2;
+        }
+
+        .grid-content {
+            border-radius: 4px;
+            min-height: 36px;
+        }
+
+        .row-bg {
+            padding: 10px 0;
+            background-color: #f9fafc;
+        }
+
+        pre {
+
+            white-space: pre-wrap;
+
+            word-wrap: break-word;
+
+        }
+    </style>
+
+</head>
+<body>
+
+
+<!--侧边-->
+<el-container style="height: 800px; border: 1px solid #eee" id="chatDiv">
+    <!--            三个边栏-->
+    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <el-menu :default-openeds="['1', '3']">
+
+            <el-menu-item index="1">
+                <el-button @click="teamButton" target="_blank">管理团队</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="2">
+                <el-button @click="personInfo" target="_blank">个人信息</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="3">
+                <el-button @click="noticeButton" target="_blank">消息通知</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="3">
+                <el-button @click="chatButton" target="_blank">聊天室</el-button>
+            </el-menu-item>
+        </el-menu>
+    </el-aside>
+
+    <el-container>
+        <el-header style="text-align: right; font-size: 12px">成员聊天室</el-header>
+        <el-main>
+            <pre>
+                <el-input
+                        type="textarea"
+                        :rows="20"
+                        style="width: 800px;"
+                        placeholder="聊天版面"
+                        v-model="textarea"
+                        :dangerouslyUseHTMLString="true"
+                        :readonly="true">
+                </el-input>
+            </pre>
+            <el-input v-model="input" placeholder="请输入要发送的内容" style="width: 300px" @keyup.enter.native = 'enterSend'></el-input>
+            <el-button type="primary" @click="sendMsg" :autofocus="true" >发送</el-button>
+        </el-main>
+
+
+
+    </el-container>
+
+
+<!--    <pre>-->
+    <!--        <el-input-->
+    <!--                type="textarea"-->
+    <!--                :rows="20"-->
+    <!--                style="width: 800px;"-->
+    <!--                placeholder=""-->
+    <!--                v-model="textarea"-->
+    <!--                :dangerouslyUseHTMLString="true"-->
+    <!--                :readonly="true">-->
+    <!--        </el-input>-->
+    <!--    </pre>-->
+
+<!--    <el-input v-model="input" placeholder="请输入要发送的内容"></el-input>-->
+<!--    <el-button type="primary" @click="sendMsg">主要按钮</el-button>-->
+
+</el-container>
+
+
+<!--导入依赖-->
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+
+
+<script type="module">
+    new Vue({
+        el: "#chatDiv",
+
+
+        mounted() {
+
+            //页面渲染结束后,发送异步请求,获取数据
+            const _this = this;
+            axios({
+                method: "post",
+                url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
+            }).then(function (resp) {
+                if (resp.data.data === '') {
+                    return ;
+                }
+                _this.username = resp.data.msg;
+                _this.position = resp.data.data.position;
+            })
+            //建立ws连接
+            _this.createWebSocket();
+        },
+
+        data() {
+
+
+            //数据
+            return {
+
+                input: '',
+
+                websocket: '',
+                position:'',
+
+                //登录的用户名
+                username: '',
+
+                textarea: '',
+
+            }
+        },
+
+        methods: {
+
+
+            enterSend(){
+                this.sendMsg();
+
+            },
+            sendMsg() {
+
+                if (this.input === '') {
+                    this.$message.error("请输入内容");
+                    return ;
+                }
+                this.websocket.send(this.username + ": " + this.input);
+                this.input = "";
+            },
+
+            //个人信息跳转
+            personInfo() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
+            },
+
+            //队伍跳转
+            teamButton() {
+                if (this.position === 0) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/chiefPeople.html");
+                } else if (this.position === 1) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/engineering.html");
+                } else if (this.position === 2) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/foreman.html");
+                } else if (this.position === 3) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/worker.html");
+                }
+            },
+
+            //通知跳转
+            noticeButton() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/notice.html";
+            },
+            chatButton() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/chat.html";
+            },
+
+            //建立ws
+            createWebSocket() {
+
+                const _this = this;
+                _this.websocket = new WebSocket('ws://localhost:8080/qg-engineering-management-system/webSocket')
+
+                _this.websocket.onopen = () => {
+                    console.log('连接成功')
+                }
+                _this.websocket.onmessage = event => {
+                    // 后端发送的消息在event.data中
+                    const h = this.$createElement;
+                    // _this.textarea.append("你好啊~<br>");
+                    // _this.textarea.append("你好!<br>");
+                    // _this.textarea.append(_this.username+": "+event.data+"<br>");
+                    _this.textarea = _this.textarea + event.data + "\n";
+                }
+                _this.websocket.onclose = function (e) {
+                    console.log('关闭了', e.code + ' ' + e.reason + ' ' + e.wasClean);
+                }
+                // // 路由跳转时结束websocket链接
+                // this.$router.afterEach(function () {
+                //     websocket.close()
+                // })
+                // 监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
+                window.onbeforeunload = function () {
+                    _this.websocket.close()
+                }
+            },
+
+            //退出登录
+            loginOut() {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/loginOut",
+                }).then(function (resp) {
+                    _this.$message.success("您已经退出登录");
+                    // _this.websocket.close();
+                    setTimeout(_this.out, 1000);
+                })
+            },
+
+            refresh() {
+                location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
+            },
+
+            out() {
+                location.href = "http://localhost:8080/qg-engineering-management-system/login.html";
+            },
+
+
+        },
+    });
+</script>
+
+</body>
+</html>

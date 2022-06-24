@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+
+    <style>
+        .center {
+            width: 500px;
+            height: 350px;
+            background-color:gainsboro;
+            border-radius: 5px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+
+            /*background: rgba(41, 39, 39, 0.46);*/
+            /*-webkit-box-shadow: 0px 35px 44px -22px rgba(0,0,0,0.72);*/
+            /*-moz-box-shadow: 0px 35px 44px -22px rgba(0,0,0,0.72);*/
+            /*box-shadow: 0px 35px 44px -22px #1f181b;*/
+            /*padding: 60px 40px;*/
+
+        }
+        body {
+            font-family:Verdana;
+
+
+            width: 100%;
+            text-transform: uppercase;
+            background: #fff;
+            background-attachment: fixed;
+            background: url(img/bg.jfif) no-repeat 0px 0px;
+            background-size: cover;
+            -webkit-background-size: cover;
+            -o-background-size: cover;
+            -moz-background-size: cover;
+            -ms-background-size: cover;
+
+            /*text-align: center;*/
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 33px;
+            font-weight: bold;
+            margin: 10px 0 35px 0;
+            color: #ffffff;
+            letter-spacing: 2px;
+            word-spacing: 4px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+<h1>工程管理系统</h1>
+<div  id="login" >
+    <el-container class="center" style="border: #666666 solid 1px">
+        <el-main>
+            <el-form :model="user" :rules="rules" ref="user" label-width="100px" class="demo-ruleForm" id="loginDiv">
+                <el-form-item >
+                    <el-header >欢迎登录</el-header>
+                </el-form-item>
+
+                <el-form-item label="用户名:" prop="username">
+                    <el-input v-model.trim="user.username" style="width: 300px;"
+                              :plain="true"  autocomplete="off"></el-input>
+                </el-form-item>
+
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model.trim="user.password" autocomplete="off"
+                              style="width: 300px;"></el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <template>
+                        <el-button type="primary" @click="submitForm('user')" :plain="true">登录</el-button>
+
+                        <el-button @click="resetForm('user')">重置</el-button>
+                        <div>
+                            没有账号?
+                            <el-link type="primary"
+                                    href="http://localhost:8080/qg-engineering-management-system/register.html">
+                                注册
+                            </el-link>
+                        </div>
+
+                        <div>
+                            登录后未跳转?
+                            <el-button type="text" @click="changeMain">点我</el-button>
+                        </div>
+                    </template>
+                </el-form-item>
+            </el-form>
+        </el-main>
+    </el-container>
+</div>
+
+<!--导入依赖-->
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+<script type="module">
+    import global from './js/global.js'
+    Vue.prototype.global = global
+</script>
+
+
+<script type="module">
+    //创建vue对象
+    new Vue({
+
+
+        el: "#loginDiv",
+        data() {
+            const validateUserName = (rule, value, callback) => {
+                const _this = this;
+                 let a = 'SCRIPT',b = 'script',c = 'html';
+                if(value.indexOf(a) > 0||value.indexOf(b) > 0||value.indexOf(c) > 0){
+                    callback(new Error("请勿输入非法字符"));
+                }
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp)  {
+                    if (resp.data.code === 500220) {
+                        // _this.$message.error(resp.data.msg);
+                        callback(new Error(resp.data.msg));
+                    } else {
+                        callback();
+                    }
+                })
+            };
+            return {
+
+                websocket:'',
+                //职位
+                position:'',
+                //登录表单
+
+                user: {
+                    username: '',
+                    password: '',
+                },
+                //表单校验
+                rules: {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                        {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'},
+                        {validator: validateUserName, trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur'}
+                    ],
+                },
+            }
+        },
+
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const _this = this;
+                        axios({
+                            method: "post",
+                            url: "http://localhost:8080/qg-engineering-management-system/user/login",
+                            data: _this.user,
+                        }).then(function (resp) {
+
+                            if (resp.data.code === 200) {
+                                _this.position = resp.data.data;
+                                _this.$message({
+                                    message: '登录成功~3秒后跳转',
+                                    type: 'success'
+                                });
+
+                                // _this.createWebSocket();
+                                //通过用户的职位进行页面的跳转
+                                setTimeout(_this.changeMain,2000);
+
+                            } else if (resp.data.code === 500200) {
+                                _this.$message.error(resp.data.msg);
+                            }else if (resp.data.code === 400) {
+                                _this.$message.error(resp.data.msg);
+                            } else {
+                                _this.$message.error('未知错误,请联系管理员');
+                            }
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+
+            createWebSocket() {
+
+                // var heartCheck = {
+                //     timeout: 1000,        //1分钟发一次心跳
+                //     timeoutObj: null,
+                //     serverTimeoutObj: null,
+                //     reset: function(){
+                //         clearTimeout(this.timeoutObj);
+                //         clearTimeout(this.serverTimeoutObj);
+                //         return this;
+                //     },
+                //     start: function(){
+                //         var _this = this;
+                //         this.timeoutObj = setTimeout(function(){
+                //             //这里发送一个心跳，后端收到后，返回一个心跳消息，
+                //             //onmessage拿到返回的心跳就说明连接正常
+                //             _this.handleMsg("ping");
+                //             console.log("ping!")
+                //             _this.serverTimeoutObj = setTimeout(function(){//如果超过一定时间还没重置，说明后端主动断开了
+                //                 _this.websocket.close();     //如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
+                //             }, _this.timeout)
+                //         }, this.timeout)
+                //     }
+                // };
+
+                const _this = this;
+                _this.websocket = new WebSocket('ws://localhost:8080/qg-engineering-management-system/webSocket')
+                // _this.global.setWs(_this.websocket);
+                // 连接成功时
+
+                // _this.websocket.onopen = _this.onopen();
+                _this.websocket.onopen = () => {
+                    // heartCheck.reset().start();
+                    console.log('连接成功')
+                    // _this.websocket.send("点击提交后的信息");
+                }
+
+                _this.websocket.onmessage = event => {
+                    // 后端发送的消息在event.data中
+                    console.log("后台发送消息")
+                    console.log(event.data)
+                    _this.myMsg = event.data;
+                    // _this.$message.success(event.data);
+                    const h = this.$createElement;
+
+                    this.$notify({
+                        title: '消息通知',
+                        message: h('i', { style: 'color: teal'}, event.data)
+                    });
+                }
+
+                _this.websocket.onclose = function (e) {
+                    console.log('关闭了',e.code + ' ' + e.reason + ' ' + e.wasClean);
+                }
+                // // 路由跳转时结束websocket链接
+                // this.$router.afterEach(function () {
+                //     websocket.close()
+                // })
+                // 监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
+                window.onbeforeunload = function () {
+                    _this.websocket.close()
+                }
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            register(formName) {
+                location.href = "http://localhost:8080/qg-engineering-management-system/register.html";
+                // _this.$message.error('师兄,注册还没开始做,验证码一直有bug');
+            },
+            //用户名输入失焦,去看看数据库是否有没有对应的名字
+            myOnblur() {
+                const _this = this;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/user/select",
+                    data: _this.user
+                }).then(function (resp)  {
+                    if (resp.data.code === 500220) {
+                        _this.$message.error(resp.data.msg);
+                    }
+                })
+            },
+
+            changeMain() {
+
+                const  position = this.position;
+                if (position === 0) {
+                    location.href = "http://localhost:8080/qg-engineering-management-system/chiefPeople.html";
+                }else if (position === 1) {
+                    location.href = "http://localhost:8080/qg-engineering-management-system/engineering.html";
+                }else if (position === 2) {
+                    location.href = "http://localhost:8080/qg-engineering-management-system/foreman.html";
+                } else if (position === 3) {
+                    location.href = "http://localhost:8080/qg-engineering-management-system/worker.html";
+                }else if (position === '' || position === -1){
+                    this.$message.error("请登录~");
+                }
+            },
+        },
+    });
+
+
+</script>
+
+
+</body>
+</html>

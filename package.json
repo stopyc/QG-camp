@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "vue-xss": "^1.0.4"
+  }
+}

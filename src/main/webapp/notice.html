@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>消息通知</title>
+</head>
+<body>
+
+<!--侧边-->
+<el-container style="height: 800px; border: 1px solid #eee" id="noticeDiv">
+    <!--            三个边栏-->
+    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <el-menu :default-openeds="['1', '3']">
+
+            <el-menu-item index="1">
+                <el-button @click="teamButton" target="_blank">管理团队</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="2">
+                <el-button @click="personInfo" target="_blank">个人信息</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="3">
+                <el-button @click="noticeButton" target="_blank">消息通知</el-button>
+            </el-menu-item>
+
+            <el-menu-item index="3">
+                <el-button @click="chatButton" target="_blank">聊天室</el-button>
+            </el-menu-item>
+        </el-menu>
+    </el-aside>
+
+    <!--我的通知-->
+    <template>
+        <el-table
+                :data="noticeTableData"
+                style="width: 100%"
+                height="250"
+                @selection-change="handleSelectionChange">
+
+            <el-table-column
+                    type="selection"
+                    width="55">
+            </el-table-column>
+
+            <el-table-column
+                    label="通知者"
+                    width="180">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.notifier }}</span>
+                </template>
+            </el-table-column>
+
+
+            <el-table-column
+                    label="内容"
+                    width="200">
+                <template slot-scope="scope">
+                    <div slot="reference" class="taskName">
+                        <el-tag size="medium">{{ scope.row.content }}</el-tag>
+                    </div>
+                </template>
+            </el-table-column>
+
+
+            <el-table-column
+                    label="时间"
+                    width="180"
+            >
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{scope.row.time}}</span>
+                </template>
+            </el-table-column>
+
+
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+
+<!--                    @click="delete(scope.$index, scope.row)"-->
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="deleteNotice"
+                            :plain="true"
+                    >删除
+                    </el-button>
+
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+</el-container>
+
+<!--导入依赖-->
+<script src="js/vue.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+
+
+<script type="module">
+    //创建vue对象
+    new Vue({
+
+
+        el: "#noticeDiv",
+
+        mounted() {
+
+            const _this = this;
+            _this.createWebSocket();
+            axios({
+                method: "post",
+                url: "http://localhost:8080/qg-engineering-management-system/user/getSession",
+            }).then(function (resp) {
+                if (resp.data.data === '') {
+                    return ;
+                }
+                _this.username = resp.data.msg;
+                _this.position = resp.data.data.position;
+            });
+
+            _this.getNotice();
+        },
+
+
+        data() {
+            return {
+
+
+                multipleSelection: [],
+
+                noticeTableData: [{
+                    noticeId: '',
+                    notifier: '',
+                    content: '',
+                    time: '',
+                }],
+
+                deleteNoticeIds:[],
+
+                websocket: '',
+
+                //职位
+                position: '',
+
+                //用户姓名
+                username: '',
+            }
+        },
+
+        methods: {
+
+            chatButton(){
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/chat.html";
+            },
+
+
+            //删除选中的通知
+            deleteNotice(){
+
+                const _this = this;
+                if (_this.multipleSelection.length === 0) {
+                    _this.$message.error("请选择你要删除的信息");
+                    return;
+                }
+
+                if (_this.multipleSelection[0].noticeId === '') {
+                    _this.$message.error("当前没有通知");
+                    return ;
+                }
+
+                this.$confirm('请确定要删除所选通知吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    _this.$message({
+                        type: 'success',
+                        message: '删除成功!',
+                    });
+
+                    for (let i = 0; i < _this.multipleSelection.length; i++) {
+                        let selectionElement = _this.multipleSelection[i];
+                        _this.deleteNoticeIds[i] = selectionElement.noticeId;
+                    }
+
+                    axios({
+                        method: "post",
+                        url: "http://localhost:8080/qg-engineering-management-system/notice/deleteNotice",
+                        data: _this.deleteNoticeIds
+                    }).then(function (resp) {
+                        if (resp.data.code === 200) {
+                            setTimeout(_this.refresh, 500);
+                        }
+                    })
+
+                }).catch(() => {
+                    _this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+
+            refresh() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/notice.html";
+            },
+
+
+            //多选
+            handleSelectionChange(val) {
+                console.log(val);
+                this.multipleSelection = val;
+            },
+
+            //获取通知
+            getNotice(){
+                const _this = this;
+                let len, j;
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/qg-engineering-management-system/notice/getNotice",
+                }).then(function (resp) {
+                    if (resp.data.code === 200) {
+                        _this.noticeTableData = resp.data.data;
+                        for (j = 0, len = _this.noticeTableData.length; j < len; j++) {
+                            //时间转换
+                            _this.noticeTableData[j].time = _this.getMyDate(resp.data.data[j].time);
+                        }
+                    }
+                })
+            },
+
+            //时间戳转换为日期
+            getMyDate(str) {
+                if (str === null) {
+                    return '无任务';
+                }
+                var oDate = new Date(str),
+                    oYear = oDate.getFullYear(),
+                    oMonth = oDate.getMonth() + 1,
+                    oDay = oDate.getDate(),
+                    oHour = oDate.getHours(),
+                    oMin = oDate.getMinutes(),
+                    oSen = oDate.getSeconds(),
+                    oTime = oYear + '-' + this.addZero(oMonth) + '-' + this.addZero(oDay) + ' ' + this.addZero(oHour) + ':' +
+                        this.addZero(oMin) + ':' + this.addZero(oSen);
+                return oTime;
+            },
+
+            //补零操作
+            addZero(num) {
+                if (parseInt(num) < 10) {
+                    num = '0' + num;
+                }
+                return num;
+            },
+
+            //换页面
+            teamButton() {
+                if (this.position === 0) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/chiefPeople.html");
+                } else if (this.position === 1) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/engineering.html");
+                } else if (this.position === 2) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/foreman.html");
+                } else if (this.position === 3) {
+                    window.location.replace("http://localhost:8080/qg-engineering-management-system/worker.html");
+                }
+            },
+
+            noticeButton(){
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/notice.html";
+            },
+
+            //个人信息跳转
+            personInfo() {
+                window.location.href = "http://localhost:8080/qg-engineering-management-system/personalInfo.html";
+            },
+
+
+            createWebSocket() {
+
+                // var heartCheck = {
+                //     timeout: 1000,        //1分钟发一次心跳
+                //     timeoutObj: null,
+                //     serverTimeoutObj: null,
+                //     reset: function(){
+                //         clearTimeout(this.timeoutObj);
+                //         clearTimeout(this.serverTimeoutObj);
+                //         return this;
+                //     },
+                //     start: function(){
+                //         var _this = this;
+                //         this.timeoutObj = setTimeout(function(){
+                //             //这里发送一个心跳，后端收到后，返回一个心跳消息，
+                //             //onmessage拿到返回的心跳就说明连接正常
+                //             _this.handleMsg("ping");
+                //             console.log("ping!")
+                //             _this.serverTimeoutObj = setTimeout(function(){//如果超过一定时间还没重置，说明后端主动断开了
+                //                 _this.websocket.close();     //如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect 会触发onclose导致重连两次
+                //             }, _this.timeout)
+                //         }, this.timeout)
+                //     }
+                // };
+
+                const _this = this;
+                _this.websocket = new WebSocket('ws://localhost:8080/qg-engineering-management-system/webSocket')
+                // _this.global.setWs(_this.websocket);
+                // 连接成功时
+
+                // _this.websocket.onopen = _this.onopen();
+                _this.websocket.onopen = () => {
+                    // heartCheck.reset().start();
+                    console.log('连接成功')
+                    // _this.websocket.send("点击提交后的信息");
+                }
+                _this.websocket.onmessage = event => {
+                    // 后端发送的消息在event.data中
+                    console.log("后台发送消息")
+                    console.log(event.data)
+                    _this.myMsg = event.data;
+                    const h = this.$createElement;
+
+                    this.$notify({
+                        title: '消息通知',
+                        message: h('i', {style: 'color: teal'}, event.data)
+                    });
+                }
+                _this.websocket.onclose = function (e) {
+                    console.log('关闭了', e.code + ' ' + e.reason + ' ' + e.wasClean);
+                }
+                // // 路由跳转时结束websocket链接
+                // this.$router.afterEach(function () {
+                //     websocket.close()
+                // })
+                // 监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常
+                window.onbeforeunload = function () {
+                    _this.websocket.close()
+                }
+            },
+
+
+        },
+    });
+
+
+</script>
+
+</body>
+</html>
